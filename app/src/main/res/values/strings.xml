@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AtlayaSwitch</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_language_button_cd">Sprache wählen</string>
+    <string name="settings_help_button_cd">Hilfe</string>
+    <string name="settings_help_title">Warum 3 Profile?</string>
+    <string name="settings_help_copyright_prefix">© 2026 Chris Deliga · atlaya.capecter.com · </string>
+    <string name="settings_help_license_link">Lizenz</string>
+    <string name="settings_help_body">AtlayaSwitch funktioniert am besten mit drei getrennten GrapheneOS-Profilen:\n\n• Eigentümer – das Systemprofil (User 0). Hier laufen Geräteverwaltung, Entwickleroptionen und Shizuku; nur hier sichtbar.\n\n• Privat – dein Alltagsprofil für die tägliche Arbeit, mit allen Apps und Konten, die du normalerweise brauchst.\n\n• Unterwegs – ein bewusst inhaltsleeres Tarnprofil mit nur unauffälligen, harmlosen Apps (z. B. Kamera, Karten, ein leerer Browser). Es lenkt ab: Wer einen kurzen Blick aufs Gerät wirft (Kontrolle, Diebstahl, Nötigung), sieht nur Belangloses und nichts, was auf weitere Profile oder sensible Daten hindeutet.\n\nDiese Trennung ist der Kern des Duress-Konzepts: Im Ernstfall wechselt AtlayaSwitch sofort und unauffällig vom aktiven Profil ins harmlose \"Unterwegs\" – ohne Passwortabfrage, ohne sichtbares Menü.</string>
+    <string-array name="settings_language_names">
+        <item>Deutsch</item>
+        <item>English</item>
+        <item>Français</item>
+        <item>Italiano</item>
+        <item>Español</item>
+    </string-array>
+    <string-array name="settings_language_tags">
+        <item>de</item>
+        <item>en</item>
+        <item>fr</item>
+        <item>it</item>
+        <item>es</item>
+    </string-array>
+    <string name="settings_section_profile">Zielprofil</string>
+    <string name="settings_target_profile_warning">ACHTUNG: AtlayaSwitch ist im Zielprofil \"%1$s\" selbst installiert. Das Zielprofil soll unverfänglich bleiben (auch für Dritte, z. B. bei einer Kontrolle) – AtlayaSwitch dort installiert zu haben verrät, dass es einen versteckten Wechselmechanismus gibt. Bitte entfernen.</string>
+    <string name="settings_target_profile_warning_button">Jetzt aus Zielprofil entfernen</string>
+    <string name="settings_target_profile_removed_toast">Aus dem Zielprofil entfernt</string>
+    <string name="settings_target_profile_remove_failed">Entfernen fehlgeschlagen – bitte von Hand prüfen: Einstellungen → Apps → AtlayaSwitch → im Profil \"%1$s\" deinstallieren.</string>
+    <string name="settings_section_switch_mode">Verhalten beim Wechsel</string>
+    <string name="settings_switch_mode_switch_only">Nur wechseln</string>
+    <string name="settings_switch_mode_switch_only_hint">Wechselt ins Zielprofil, das bisherige Profil bleibt im Hintergrund aktiv und entsperrt.</string>
+    <string name="settings_switch_mode_end_session">Wechseln + Sitzung beenden</string>
+    <string name="settings_switch_mode_end_session_hint">Beendet nach dem Wechsel zusätzlich das bisherige Profil vollständig (Apps werden geschlossen, GrapheneOS entfernt dessen Verschlüsselungsschlüssel aus RAM/Hardware-Registern – das Profil geht wieder \"at rest\") – Standard. Hinweis: Bei Wechsel aus dem Profil \"Eigentümer\" kann Android das verweigern, da sich der Systemnutzer grundsätzlich nicht stoppen lässt – in diesem Fall wird stillschweigend nur gewechselt, ohne Fehlermeldung.</string>
+    <string name="settings_section_nfc">NFC-Ring</string>
+    <string name="settings_nfc_not_paired">Kein Ring gekoppelt</string>
+    <string name="settings_nfc_paired">Ring gekoppelt (UID %1$s)</string>
+    <string name="settings_nfc_pair_button">Ring koppeln</string>
+    <string name="settings_nfc_pair_waiting">Jetzt Ring ans Telefon halten…</string>
+    <string name="settings_nfc_pair_done">Ring gekoppelt</string>
+    <string name="settings_nfc_unpair_button">Ring entkoppeln</string>
+    <string name="settings_nfc_unpaired_toast">Kopplung aufgehoben</string>
+    <string name="settings_nfc_test_button">UID-Stabilität testen</string>
+    <string name="settings_shizuku_not_installed_owner">Shizuku ist nicht installiert – ohne Shizuku funktioniert der Profilwechsel nicht. Am besten aus dem Play Store installieren, danach hier auf \"Shizuku öffnen\" tippen und dort einmalig \"Start über Drahtloses Debugging\" einrichten (läuft komplett auf dem Gerät, ohne PC).</string>
+    <string name="settings_shizuku_not_installed_other">Shizuku ist nicht installiert. Entwickleroptionen und Drahtloses Debugging sind nur im Profil \"Eigentümer\" sichtbar – dort zuerst installieren und einrichten, danach hier automatisch erkannt.</string>
+    <string name="settings_shizuku_install_button">Shizuku installieren (Play Store)</string>
+    <string name="settings_shizuku_switch_profile_button">Profil wechseln</string>
+    <string name="settings_shizuku_not_running">Shizuku ist installiert, läuft aber nicht (z. B. nach einem Geräte-Neustart) – für den Profilwechsel erforderlich. Bitte hier öffnen und einmalig \"Start über Drahtloses Debugging\" antippen.</string>
+    <string name="settings_shizuku_open_button">Shizuku öffnen</string>
+    <string name="settings_shizuku_wrong_profile">Shizuku läuft nicht und kann von hier aus nicht gestartet werden: Entwickleroptionen/Drahtloses Debugging sind nur im Profil \"Eigentümer\" sichtbar. Dort öffnen und einmalig \"Start über Drahtloses Debugging\" antippen – läuft danach systemweit auch hier weiter.</string>
+    <string name="settings_section_nfc_permission">NFC-Start-Berechtigung</string>
+    <string name="settings_nfc_tag_pref_hint">Android verlangt seit Version 14 pro App und pro Profil eine eigene Freigabe, damit sie durch bloßes Vorhalten eines NFC-Tags gestartet werden darf. Ohne diese Freigabe bleibt der Ring stumm, selbst wenn Kopplung und Stabilitätstest in Ordnung sind – und zwar getrennt für jedes Profil, in dem der Ring genutzt werden soll.</string>
+    <string name="settings_nfc_tag_pref_label">Start bei NFC-Scan erlauben</string>
+    <string name="settings_nfc_tag_pref_status_on">Aktiv – der Ring-Trigger funktioniert in diesem Profil.</string>
+    <string name="settings_nfc_tag_pref_status_off">Noch nicht erlaubt – bitte Schalter umlegen und auf \"Speichern\" tippen.</string>
+    <string name="settings_nfc_tag_pref_status_unknown">Status unbekannt – Shizuku wird zum Prüfen benötigt.</string>
+    <string name="settings_nfc_tag_pref_open_settings_button">System-Einstellung von Hand öffnen</string>
+    <string name="settings_nfc_tag_pref_failed">Automatisches Umschalten fehlgeschlagen. System-Einstellung wird geöffnet – bitte dort \"AtlayaSwitch\" antippen und den Schalter von Hand umlegen.</string>
+    <string name="settings_save_button">Speichern</string>
+    <string name="settings_back_button">Zurück</string>
+    <string name="settings_saved_toast">Gespeichert</string>
+    <string name="settings_save_needs_shizuku">Shizuku wird benötigt, um das zu speichern.</string>
+    <string name="settings_section_updates">Updates</string>
+    <string name="settings_installed_version">Installierte Version: v%1$s</string>
+    <string name="settings_update_status_checking">Prüfe…</string>
+    <string name="settings_update_status_current">Aktuell (v%1$s)</string>
+    <string name="settings_update_status_available">Update verfügbar: v%1$s (installiert: v%2$s)</string>
+    <string name="settings_update_status_error">Update-Prüfung fehlgeschlagen: %1$s</string>
+    <string name="settings_update_check_button">Jetzt prüfen</string>
+    <string name="settings_update_download_button">Herunterladen</string>
+    <string name="settings_update_auto_label">Beim Öffnen automatisch prüfen</string>
+    <string name="nfc_test_title">NFC-UID-Stabilitätstest</string>
+    <string name="nfc_test_no_hardware">Dieses Gerät hat keine NFC-Hardware.</string>
+    <string name="nfc_test_disabled">NFC ist deaktiviert. Bitte in den Einstellungen aktivieren und zurückkehren.</string>
+    <string name="nfc_test_scan_first">Chip zum ersten Mal ans Telefon halten…</string>
+    <string name="nfc_test_scan_again">Erster Scan erfasst. Denselben Chip jetzt ein zweites Mal ans Telefon halten…</string>
+    <string name="nfc_test_done">Test abgeschlossen.</string>
+    <string name="nfc_test_scan1_placeholder">Scan 1: –</string>
+    <string name="nfc_test_scan2_placeholder">Scan 2: –</string>
+    <string name="nfc_test_scan1_label">Scan 1: %1$s</string>
+    <string name="nfc_test_scan2_label">Scan 2: %1$s</string>
+    <string name="nfc_test_result_stable">Stabil – Trigger möglich</string>
+    <string name="nfc_test_result_rotating">Rotierend – Trigger NICHT möglich</string>
+    <string name="nfc_test_reset_button">Neu testen</string>
+</resources>

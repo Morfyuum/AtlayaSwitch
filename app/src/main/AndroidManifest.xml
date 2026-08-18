@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AtlayaSwitch"
+        android:localeConfig="@xml/locales_config"
+        android:exported="false">
+
+        <!-- Startet den Wechsel beim Antippen des App-Icons ODER beim Scannen eines
+             gekoppelten NFC-Rings (nur bei UID-Treffer, siehe MainActivity.handleNfcLaunch) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AtlayaSwitch.Transparent"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
+
+        <!-- Einstellungen: Zielprofil + NFC-Ring-Kopplung. Direkt startbar UND über
+             die "App-Info"-Seite der Systemeinstellungen erreichbar
+             (ACTION_APPLICATION_PREFERENCES zeigt dort automatisch einen
+             "Einstellungen"-Link an), damit kein eigenes auffälliges Menü nötig ist. -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="true"
+            android:label="@string/settings_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Test-Modus: prüft vor jeder Trigger-Umsetzung, ob die UID des Chips fest oder rotierend ist -->
+        <activity
+            android:name=".NfcTestActivity"
+            android:exported="true"
+            android:label="@string/nfc_test_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Erforderlich für die Kommunikation mit dem Shizuku-Dienst -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="com.capecter.atlayaswitch.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true" />
+
+    </application>
+</manifest>
