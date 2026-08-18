@@ -1,0 +1,30 @@
+# Build-Ausgaben
+/build/
+/app/build/
+.gradle/
+
+# Lokale, maschinenspezifische Konfiguration
+local.properties
+
+# Signierungsschlüssel - niemals veröffentlichen
+*.jks
+*.keystore
+keystore.properties
+
+# Editor-/Tool-Konfiguration
+.Entwicklungswerkzeug/
+.vscode/
+.idea/
+AtlayaSwitch.code-workspace
+
+# Alter Backup-Ordner (Duplikat des Projekts)
+/save/
+
+# Interne Entwicklungs-Notizen (Bedrohungsmodell, Arbeitsprompts) - nicht fuer die Veroeffentlichung
+/interne Projekt-Doku
+/interne Projekt-Doku
+/PROMPT_NFC_TRIGGER.md
+
+# Android Studio
+*.iml
+.DS_Store

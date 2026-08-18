@@ -1,0 +1,90 @@
+Atlaya Source-Available License (ASAL) v1.0
+Copyright (c) 2026 Chris Deliga
+
+This license applies to the software in this repository ("the Software"),
+including all source code, configuration, and accompanying materials, unless
+a file explicitly states otherwise.
+
+1. GRANT OF LICENSE
+   Subject to the terms of this license, the copyright holder grants you a
+   worldwide, royalty-free, non-exclusive, non-transferable license to:
+   (a) download and install the Software, and
+   (b) run the Software, unmodified, for your own personal or internal,
+       non-commercial purposes.
+
+2. RESTRICTIONS
+   Except as expressly permitted under Section 1, you may NOT, without prior
+   written permission from the copyright holder:
+   (a) modify, adapt, translate, or create derivative works of the Software,
+       other than through the Software's own documented, user-facing
+       configuration options;
+   (b) redistribute, sublicense, rent, lease, or otherwise make the
+       Software or any modified version of it available to any third party,
+       whether for free or for a fee;
+   (c) use the Software, in whole or in part, for any commercial purpose,
+       including as part of a product or service offered to others;
+   (d) remove, obscure, or alter any copyright, trademark, or license
+       notice contained in the Software;
+   (e) use the Software to develop a competing product or service.
+
+3. SOURCE AVAILABILITY IS NOT AN OPEN LICENSE
+   The source code of the Software may be visible in this repository for
+   transparency and auditability (so that you can verify what the Software
+   does before running it on your own device). Making the source code
+   visible does NOT grant any rights beyond those explicitly stated in
+   Section 1. In particular, visibility of the source code does not imply
+   permission to modify, redistribute, or create derivative works.
+
+4. TRADEMARKS AND NAMING
+   "AtlayaSwitch," "Atlaya," and any associated logos or branding are
+   reserved to the copyright holder. You may not use these names, or any
+   confusingly similar name, to identify any modified version, fork, or
+   derivative work, or any other software or service, without prior
+   written permission.
+
+5. CONTRIBUTIONS
+   If you submit a pull request, patch, or other contribution to this
+   repository ("Contribution"), you grant the copyright holder a
+   perpetual, worldwide, royalty-free, irrevocable license to use,
+   reproduce, modify, and distribute your Contribution as part of the
+   Software, under any license terms the copyright holder chooses,
+   including this one. You confirm that you have the right to grant this
+   license for your Contribution.
+
+6. TERMINATION
+   This license terminates automatically, without notice, if you breach
+   any of its terms. Upon termination, you must stop using the Software
+   and destroy any copies in your possession, except as required to
+   preserve evidence of, or remedy, the breach.
+
+7. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+8. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM,
+   DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR
+   OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR
+   THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+9. GOVERNING LAW
+   This license is governed by the laws of the Federal Republic of
+   Germany, without regard to its conflict-of-law principles. Any dispute
+   arising from this license shall be subject to the exclusive
+   jurisdiction of the courts of Germany.
+
+10. REQUESTING ADDITIONAL RIGHTS
+    If you wish to use the Software beyond the scope of this license
+    (e.g., for commercial purposes, redistribution, or building a
+    derivative product), please contact the copyright holder to discuss a
+    separate license agreement.
+
+---
+
+License history: versions of AtlayaSwitch released up to and including
+v1.7 were published under the MIT License. Those specific released
+versions remain available to their recipients under the MIT License terms
+that applied at the time of release (this cannot be revoked retroactively).
+Starting with the next version after v1.7, AtlayaSwitch is licensed under
+the Atlaya Source-Available License (ASAL) v1.0 above.
