@@ -26,7 +26,7 @@
     <string name="settings_nfc_unpair_button">Desemparejar anillo</string>
     <string name="settings_nfc_unpaired_toast">Emparejamiento eliminado</string>
     <string name="settings_nfc_test_button">Probar estabilidad del UID</string>
-    <string name="settings_nfc_repair_hint">¿El anillo dejó de funcionar de repente tras cambiar de perfil, aunque el emparejamiento y el permiso están correctos (fallo conocido de Android/GrapheneOS tras \"am switch-user\")? Toca aquí en vez de reiniciar todo el dispositivo: reconstruye la detección NFC solo para este perfil. AtlayaSwitch se reiniciará brevemente, es normal.</string>
+    <string name="settings_nfc_repair_hint">AtlayaSwitch repara automáticamente en segundo plano la detección NFC del perfil que abandonas tras cada cambio que ella misma provoca (anillo o icono). Solo si el anillo no responde justo tras cambiar de perfil desde los ajustes rápidos del sistema (no desde AtlayaSwitch), toca aquí en vez de reiniciar todo el dispositivo. AtlayaSwitch se reiniciará brevemente, es normal.</string>
     <string name="settings_nfc_repair_button">Reparar detección del anillo NFC</string>
     <string name="settings_nfc_repair_running">Reparando…</string>
     <string name="settings_nfc_repair_done">Listo. Prueba el anillo ahora.</string>

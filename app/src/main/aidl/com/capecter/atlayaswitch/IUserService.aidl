@@ -2,8 +2,8 @@ package com.capecter.atlayaswitch;
 
 interface IUserService {
     String listUsersRaw();
-    void switchUser(int userId);
-    boolean switchUserAndEndSession(int targetUserId, int sourceUserId);
+    void switchUser(int userId, int sourceUserId, String apkPath);
+    boolean switchUserAndEndSession(int targetUserId, int sourceUserId, String apkPath);
     boolean getNfcTagAppPreference(int userId, String pkg);
     boolean setNfcTagAppPreference(int userId, String pkg, boolean allow);
     boolean isPackageInstalledForUser(int userId, String pkg);

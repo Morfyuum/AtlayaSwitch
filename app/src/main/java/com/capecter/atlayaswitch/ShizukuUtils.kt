@@ -152,8 +152,9 @@ object ShizukuUtils {
         onDone: () -> Unit,
         onError: (Exception) -> Unit
     ) {
+        val apkPath = context.applicationContext.applicationInfo.sourceDir
         withUserService(context, onError) { service ->
-            service.switchUser(userId)
+            service.switchUser(userId, currentProfileUserId(), apkPath)
             postMain { onDone() }
         }
     }
@@ -176,8 +177,9 @@ object ShizukuUtils {
         onDone: (endSessionSucceeded: Boolean) -> Unit,
         onError: (Exception) -> Unit
     ) {
+        val apkPath = context.applicationContext.applicationInfo.sourceDir
         withUserService(context, onError) { service ->
-            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
+            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId, apkPath)
             postMain { onDone(ok) }
         }
     }
@@ -284,7 +286,7 @@ object ShizukuUtils {
             .daemon(false)
             .processNameSuffix("privileged")
             .debuggable(false)
-            .version(1)
+            .version(2)
     }
 
     /**

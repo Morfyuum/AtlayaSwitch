@@ -26,7 +26,7 @@
     <string name="settings_nfc_unpair_button">Unpair ring</string>
     <string name="settings_nfc_unpaired_toast">Pairing removed</string>
     <string name="settings_nfc_test_button">Test UID stability</string>
-    <string name="settings_nfc_repair_hint">Did the ring suddenly stop working after switching profiles, even though pairing and permission look fine (known Android/GrapheneOS bug after \"am switch-user\")? Tap here instead of rebooting the whole device – rebuilds NFC detection for this profile only. AtlayaSwitch will briefly restart, that\'s expected.</string>
+    <string name="settings_nfc_repair_hint">AtlayaSwitch automatically repairs NFC detection in the background for the profile you leave after every switch it triggers itself (ring or icon). Only if the ring doesn\'t react right after switching via the system\'s quick settings (not via AtlayaSwitch), tap here instead of rebooting the whole device. AtlayaSwitch will briefly restart, that\'s expected.</string>
     <string name="settings_nfc_repair_button">Repair NFC ring detection</string>
     <string name="settings_nfc_repair_running">Repairing…</string>
     <string name="settings_nfc_repair_done">Done. Try the ring now.</string>

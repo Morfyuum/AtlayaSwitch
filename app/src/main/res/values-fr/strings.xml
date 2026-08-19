@@ -26,7 +26,7 @@
     <string name="settings_nfc_unpair_button">Dissocier l\'anneau</string>
     <string name="settings_nfc_unpaired_toast">Association supprimée</string>
     <string name="settings_nfc_test_button">Tester la stabilité de l\'UID</string>
-    <string name="settings_nfc_repair_hint">L\'anneau a-t-il soudainement cessé de fonctionner après un changement de profil, alors que le couplage et l\'autorisation semblent corrects (bug Android/GrapheneOS connu après \"am switch-user\") ? Touchez ici plutôt que de redémarrer tout l\'appareil – reconstruit la détection NFC pour ce profil uniquement. AtlayaSwitch va brièvement redémarrer, c\'est normal.</string>
+    <string name="settings_nfc_repair_hint">AtlayaSwitch répare automatiquement en arrière-plan la détection NFC du profil que vous quittez après chaque changement qu\'elle déclenche elle-même (anneau ou icône). Uniquement si l\'anneau ne réagit pas juste après un changement via les réglages rapides du système (pas via AtlayaSwitch), touchez ici plutôt que de redémarrer tout l\'appareil. AtlayaSwitch va brièvement redémarrer, c\'est normal.</string>
     <string name="settings_nfc_repair_button">Réparer la détection de l\'anneau NFC</string>
     <string name="settings_nfc_repair_running">Réparation…</string>
     <string name="settings_nfc_repair_done">Terminé. Essayez l\'anneau maintenant.</string>

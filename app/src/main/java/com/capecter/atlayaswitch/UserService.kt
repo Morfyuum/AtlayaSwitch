@@ -12,8 +12,9 @@ class UserService : IUserService.Stub() {
 
     override fun listUsersRaw(): String = runShellCommand("pm", "list", "users")
 
-    override fun switchUser(userId: Int) {
+    override fun switchUser(userId: Int, sourceUserId: Int, apkPath: String) {
         runShellCommand("am", "switch-user", userId.toString())
+        repairNfcDispatchCacheForUser(sourceUserId, apkPath)
     }
 
     /**
@@ -29,13 +30,35 @@ class UserService : IUserService.Stub() {
      * oder wenn stop-user selbst fehlschlägt - z.B. bei Profil "Eigentümer"
      * (User 0): Android verweigert das Stoppen des Systemnutzers grundsätzlich.
      */
-    override fun switchUserAndEndSession(targetUserId: Int, sourceUserId: Int): Boolean {
+    override fun switchUserAndEndSession(targetUserId: Int, sourceUserId: Int, apkPath: String): Boolean {
         runShellCommand("am", "switch-user", targetUserId.toString())
         if (!waitUntilCurrentUser(targetUserId)) {
             return false
         }
+        // Reparatur VOR dem Stoppen: sourceUserId ist hier noch ein "normaler",
+        // gerade erst in den Hintergrund getretener Nutzer - ob ein "pm install"
+        // gegen einen bereits per stop-user gestoppten Nutzer noch zuverlaessig
+        // greift, ist ungetestet, deshalb lieber vorher.
+        repairNfcDispatchCacheForUser(sourceUserId, apkPath)
         val result = runShellCommand("am", "stop-user", "-f", sourceUserId.toString())
         return !result.contains("Error", ignoreCase = true)
+    }
+
+    /**
+     * Siehe repairNfcDispatchCache() weiter unten fuer den Hintergrund des Tricks selbst.
+     * Hier automatisch und lautlos auf das Profil angewendet, das gerade verlassen wird -
+     * NIE auf das Zielprofil (koennte AtlayaSwitch dort ungewollt sichtbar installieren,
+     * falls es dort noch nicht drauf ist - das widerspraeche dem Tarnprofil-Konzept, siehe
+     * SettingsActivity.checkTargetProfileInstalled()). Bewusst best-effort: ein Fehlschlag
+     * hier darf den eigentlichen Profilwechsel nie verhindern oder verzoegern koennen -
+     * deshalb Exceptions verschluckt statt sie den Aufrufer stoeren zu lassen.
+     */
+    private fun repairNfcDispatchCacheForUser(userId: Int, apkPath: String) {
+        try {
+            runShellCommand("pm", "install", "-r", "--user", userId.toString(), apkPath)
+        } catch (e: Exception) {
+            // Bewusst ignoriert - siehe Doku oben.
+        }
     }
 
     private fun waitUntilCurrentUser(userId: Int): Boolean {

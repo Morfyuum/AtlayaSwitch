@@ -41,7 +41,7 @@
     <string name="settings_nfc_unpair_button">Ring entkoppeln</string>
     <string name="settings_nfc_unpaired_toast">Kopplung aufgehoben</string>
     <string name="settings_nfc_test_button">UID-Stabilität testen</string>
-    <string name="settings_nfc_repair_hint">Reagiert der Ring nach einem Profilwechsel plötzlich nicht mehr, obwohl Kopplung und Freigabe in Ordnung sind (bekannter Android/GrapheneOS-Fehler nach \"am switch-user\")? Hier antippen, statt das ganze Gerät neu zu starten – baut die interne NFC-Erkennung nur für dieses Profil neu auf. AtlayaSwitch startet dabei kurz neu, das ist normal.</string>
+    <string name="settings_nfc_repair_hint">AtlayaSwitch repariert die NFC-Erkennung nach jedem selbst ausgelösten Wechsel (Ring oder Icon) automatisch im Hintergrund für das verlassene Profil. Nur falls der Ring direkt nach einem Wechsel über die System-Schnelleinstellungen (nicht über AtlayaSwitch) nicht reagiert, hier antippen statt das ganze Gerät neu zu starten. AtlayaSwitch startet dabei kurz neu, das ist normal.</string>
     <string name="settings_nfc_repair_button">NFC-Ring-Erkennung reparieren</string>
     <string name="settings_nfc_repair_running">Repariere…</string>
     <string name="settings_nfc_repair_done">Erledigt. Ring jetzt testen.</string>
