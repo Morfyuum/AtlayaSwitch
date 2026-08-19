@@ -156,8 +156,8 @@ object ShizukuUtils {
         val sourceUserId = currentProfileUserId()
         withUserService(context, onError) { service ->
             service.switchUser(userId)
-            postMain { onDone() }
             repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
+            postMain { onDone() }
         }
     }
 
@@ -182,17 +182,23 @@ object ShizukuUtils {
         val apkPath = context.applicationContext.applicationInfo.sourceDir
         withUserService(context, onError) { service ->
             val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
-            postMain { onDone(ok) }
             repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
+            postMain { onDone(ok) }
         }
     }
 
     /**
      * Reparatur als EIGENER, zweiter Binder-Aufruf ueber die bereits verbundene Instanz,
-     * bewusst NACH dem postMain{onDone(...)} des primaeren Wechsels: postMain() stellt nur
-     * zu, wartet aber nicht - der Aufrufer (MainActivity) sieht den Wechsel also sofort als
-     * abgeschlossen und kann sich beenden, waehrend dieser Hintergrund-Thread noch mit der
-     * (langsameren) Neuinstallation beschaeftigt ist. Fehlschlaege bewusst ignoriert - das
+     * bewusst VOR dem postMain{onDone(...)} des primaeren Wechsels aufgerufen - nicht danach.
+     * Grund: MainActivity ruft in onDone sofort finish() auf; da die Activity noHistory/
+     * excludeFromRecents ist, killt Android den App-Prozess sehr bald danach. Ein NACH
+     * postMain{} platzierter Aufruf wurde dadurch beim Testen (2026-08-19) regelmaessig
+     * mitgetoetet, bevor er je feuern konnte - keine Logs, kein Fehler, einfach nichts.
+     * Der sichtbare Wechsel selbst wird davon nicht verlangsamt: "am switch-user" (bzw.
+     * switchUserAndEndSession() komplett) ist zu diesem Zeitpunkt bereits durchgelaufen,
+     * die Systemumschaltung passiert unabhaengig vom Zeitpunkt, an dem sich diese App
+     * selbst beendet - nur der App-Prozess bleibt dadurch im Hintergrund des verlassenen
+     * Profils ein bis zwei Sekunden laenger am Leben. Fehlschlaege bewusst ignoriert - das
      * ist ein Best-Effort-Kosmetikschritt fuer's naechste Mal, kein Teil des eigentlichen
      * Wechsels. Siehe UserService.repairNfcDispatchCache() fuer den Hintergrund des Tricks.
      */
