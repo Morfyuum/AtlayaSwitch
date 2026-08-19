@@ -12,9 +12,8 @@ class UserService : IUserService.Stub() {
 
     override fun listUsersRaw(): String = runShellCommand("pm", "list", "users")
 
-    override fun switchUser(userId: Int, sourceUserId: Int, apkPath: String) {
+    override fun switchUser(userId: Int) {
         runShellCommand("am", "switch-user", userId.toString())
-        repairNfcDispatchCacheForUser(sourceUserId, apkPath)
     }
 
     /**
@@ -30,16 +29,11 @@ class UserService : IUserService.Stub() {
      * oder wenn stop-user selbst fehlschlägt - z.B. bei Profil "Eigentümer"
      * (User 0): Android verweigert das Stoppen des Systemnutzers grundsätzlich.
      */
-    override fun switchUserAndEndSession(targetUserId: Int, sourceUserId: Int, apkPath: String): Boolean {
+    override fun switchUserAndEndSession(targetUserId: Int, sourceUserId: Int): Boolean {
         runShellCommand("am", "switch-user", targetUserId.toString())
         if (!waitUntilCurrentUser(targetUserId)) {
             return false
         }
-        // Reparatur VOR dem Stoppen: sourceUserId ist hier noch ein "normaler",
-        // gerade erst in den Hintergrund getretener Nutzer - ob ein "pm install"
-        // gegen einen bereits per stop-user gestoppten Nutzer noch zuverlaessig
-        // greift, ist ungetestet, deshalb lieber vorher.
-        repairNfcDispatchCacheForUser(sourceUserId, apkPath)
         val result = runShellCommand("am", "stop-user", "-f", sourceUserId.toString())
         return !result.contains("Error", ignoreCase = true)
     }
@@ -67,18 +61,21 @@ class UserService : IUserService.Stub() {
      * NIE auf das Zielprofil (koennte AtlayaSwitch dort ungewollt sichtbar installieren,
      * falls es dort noch nicht drauf ist - das widerspraeche dem Tarnprofil-Konzept, siehe
      * SettingsActivity.checkTargetProfileInstalled()). Bewusst best-effort: ein Fehlschlag
-     * hier darf den eigentlichen Profilwechsel nie verhindern oder verzoegern koennen -
-     * deshalb Exceptions verschluckt statt sie den Aufrufer stoeren zu lassen.
+     * hier darf den eigentlichen Profilwechsel nie verhindern oder verzoegern koennen.
+     * Deshalb IMMER als eigener, zweiter AIDL-Aufruf NACH switchUser()/switchUserAndEndSession()
+     * verwenden (siehe ShizukuUtils) statt in diese eingebaut - beides sind synchrone
+     * Binder-Aufrufe, ein eingebauter Aufruf wuerde onDone() beim Aufrufer erst nach
+     * Abschluss der (relativ langsamen) Neuinstallation feuern lassen. Genau das geschah
+     * hier zuerst und fuehrte zu spuerbaren Haengern/Timeouts beim Wechsel selbst - siehe
+     * Git-Historie. Exceptions werden verschluckt, damit ein Fehlschlag hier nicht in der
+     * App ankommt (Aufrufer ignoriert das Ergebnis ohnehin).
      */
-    private fun repairNfcDispatchCacheForUser(userId: Int, apkPath: String) {
+    override fun repairNfcDispatchCache(userId: Int, apkPath: String) {
         try {
             val result = runShellCommand("pm", "install", "-r", "--user", userId.toString(), apkPath)
-            android.util.Log.i(
-                "AtlayaSwitchUserService",
-                "repairNfcDispatchCacheForUser(userId=$userId): $result"
-            )
+            android.util.Log.i("AtlayaSwitchUserService", "repairNfcDispatchCache(userId=$userId): $result")
         } catch (e: Exception) {
-            android.util.Log.e("AtlayaSwitchUserService", "repairNfcDispatchCacheForUser(userId=$userId) fehlgeschlagen", e)
+            android.util.Log.e("AtlayaSwitchUserService", "repairNfcDispatchCache(userId=$userId) fehlgeschlagen", e)
         }
     }
 

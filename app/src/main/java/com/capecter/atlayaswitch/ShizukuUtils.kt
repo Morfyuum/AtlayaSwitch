@@ -153,9 +153,11 @@ object ShizukuUtils {
         onError: (Exception) -> Unit
     ) {
         val apkPath = context.applicationContext.applicationInfo.sourceDir
+        val sourceUserId = currentProfileUserId()
         withUserService(context, onError) { service ->
-            service.switchUser(userId, currentProfileUserId(), apkPath)
+            service.switchUser(userId)
             postMain { onDone() }
+            repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
         }
     }
 
@@ -179,8 +181,26 @@ object ShizukuUtils {
     ) {
         val apkPath = context.applicationContext.applicationInfo.sourceDir
         withUserService(context, onError) { service ->
-            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId, apkPath)
+            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
             postMain { onDone(ok) }
+            repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
+        }
+    }
+
+    /**
+     * Reparatur als EIGENER, zweiter Binder-Aufruf ueber die bereits verbundene Instanz,
+     * bewusst NACH dem postMain{onDone(...)} des primaeren Wechsels: postMain() stellt nur
+     * zu, wartet aber nicht - der Aufrufer (MainActivity) sieht den Wechsel also sofort als
+     * abgeschlossen und kann sich beenden, waehrend dieser Hintergrund-Thread noch mit der
+     * (langsameren) Neuinstallation beschaeftigt ist. Fehlschlaege bewusst ignoriert - das
+     * ist ein Best-Effort-Kosmetikschritt fuer's naechste Mal, kein Teil des eigentlichen
+     * Wechsels. Siehe UserService.repairNfcDispatchCache() fuer den Hintergrund des Tricks.
+     */
+    private fun repairNfcDispatchCacheBestEffort(service: IUserService, userId: Int, apkPath: String) {
+        try {
+            service.repairNfcDispatchCache(userId, apkPath)
+        } catch (e: Exception) {
+            // Bewusst ignoriert - siehe Doku oben.
         }
     }
 
@@ -270,7 +290,7 @@ object ShizukuUtils {
             .daemon(false)
             .processNameSuffix("privileged")
             .debuggable(false)
-            .version(3)
+            .version(4)
     }
 
     /**
