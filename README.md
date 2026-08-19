@@ -11,7 +11,7 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 **Benefits:**
 - No root required — uses only [Shizuku's](https://shizuku.rikka.app/) ADB shell privileges, GrapheneOS' security model stays fully intact
 - No visible picker menu, no spoken codeword — switches in under a second
-- Optional NFC ring trigger, works even with the screen locked or off
+- Optional NFC ring trigger, works while the screen is on and unlocked
 - The way back stays the regular, password-protected GrapheneOS profile switch — no new attack surface
 - Automatically detects if it's accidentally installed in the decoy profile itself (which would give the trick away) and offers one-tap removal
 - Fully offline, no cloud, no trackers
@@ -111,7 +111,9 @@ In **SettingsActivity** under "NFC ring":
 2. Hold the ring to the phone once -> the UID is saved locally as a hex string in SharedPreferences (`atlaya_switch` / `paired_nfc_uid`), no cloud sync.
 3. "Unpair ring" deletes the saved UID again.
 
-Once paired, the trigger works immediately: holding the ring to the phone (even with the screen locked or off) triggers the same profile switch as tapping the app icon. With a wrong/unrecognized tag (no UID match) nothing happens and there's no feedback at all — deliberately so the trigger stays inconspicuous. This requires a confirmed **stable** UID from the stability test (see below); it won't work with a rotating chip. **In addition**, the NFC start permission must be on (next section) — without it the ring stays silent even though pairing and the stability test are fine.
+Once paired, the trigger works immediately: holding the ring to the phone while the screen is on and unlocked triggers the same profile switch as tapping the app icon. With a wrong/unrecognized tag (no UID match) nothing happens and there's no feedback at all — deliberately so the trigger stays inconspicuous. This requires a confirmed **stable** UID from the stability test (see below); it won't work with a rotating chip. **In addition**, the NFC start permission must be on (next section) — without it the ring stays silent even though pairing and the stability test are fine.
+
+**Screen must be on and unlocked:** with the screen locked or off, Android's NFC controller stops polling for external tags entirely (confirmed via `dumpsys nfc`/logcat: zero read activity in that state) — this is a platform-level anti-skimming measure that applies to every app, not something AtlayaSwitch can selectively bypass just for the paired ring, since the chip never even attempts to read a tag's UID while locked. The ring trigger therefore only works in the moment the phone is already unlocked and in use.
 
 ## NFC start permission (Android system toggle, per profile)
 
