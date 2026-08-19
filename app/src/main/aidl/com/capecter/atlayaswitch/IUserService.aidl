@@ -8,4 +8,5 @@ interface IUserService {
     boolean setNfcTagAppPreference(int userId, String pkg, boolean allow);
     boolean isPackageInstalledForUser(int userId, String pkg);
     boolean uninstallForUser(int userId, String pkg);
+    boolean repairNfcDispatchCache(String apkPath);
 }

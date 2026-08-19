@@ -236,6 +236,22 @@ object ShizukuUtils {
         }
     }
 
+    /**
+     * Siehe UserService.repairNfcDispatchCache() fuer den Hintergrund. Nutzt den eigenen,
+     * bereits installierten APK-Pfad (sourceDir) - es muss keine Datei mitgeliefert werden.
+     */
+    fun repairNfcDispatchCache(
+        context: Context,
+        onResult: (Boolean) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val apkPath = context.applicationInfo.sourceDir
+        withUserService(context, onError) { service ->
+            val ok = service.repairNfcDispatchCache(apkPath)
+            postMain { onResult(ok) }
+        }
+    }
+
     /** Entfernt AtlayaSwitch aus einem fremden Profil (z.B. dem Zielprofil), ohne dass
      * dafür erst dorthin gewechselt werden muss. */
     fun uninstallFromProfile(

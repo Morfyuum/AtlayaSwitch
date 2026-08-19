@@ -26,6 +26,11 @@
     <string name="settings_nfc_unpair_button">Dissocier l\'anneau</string>
     <string name="settings_nfc_unpaired_toast">Association supprimée</string>
     <string name="settings_nfc_test_button">Tester la stabilité de l\'UID</string>
+    <string name="settings_nfc_repair_hint">L\'anneau a-t-il soudainement cessé de fonctionner après un changement de profil, alors que le couplage et l\'autorisation semblent corrects (bug Android/GrapheneOS connu après \"am switch-user\") ? Touchez ici plutôt que de redémarrer tout l\'appareil – reconstruit la détection NFC pour ce profil uniquement. AtlayaSwitch va brièvement redémarrer, c\'est normal.</string>
+    <string name="settings_nfc_repair_button">Réparer la détection de l\'anneau NFC</string>
+    <string name="settings_nfc_repair_running">Réparation…</string>
+    <string name="settings_nfc_repair_done">Terminé. Essayez l\'anneau maintenant.</string>
+    <string name="settings_nfc_repair_failed">Échec – redémarrez plutôt l\'appareil.</string>
     <string name="settings_shizuku_not_installed_owner">Shizuku n\'est pas installé – le changement de profil ne fonctionne pas sans lui. Installez-le de préférence depuis le Play Store, puis appuyez ici sur \"Ouvrir Shizuku\" et configurez une seule fois \"Démarrage via débogage sans fil\" (fonctionne entièrement sur l\'appareil, sans PC).</string>
     <string name="settings_shizuku_not_installed_other">Shizuku n\'est pas installé. Les options développeur et le débogage sans fil ne sont visibles que dans le profil \"Propriétaire\" – installez et configurez-le d\'abord là-bas, il sera ensuite détecté automatiquement ici.</string>
     <string name="settings_shizuku_install_button">Installer Shizuku (Play Store)</string>
