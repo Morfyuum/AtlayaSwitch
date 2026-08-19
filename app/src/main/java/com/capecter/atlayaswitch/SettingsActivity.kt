@@ -57,7 +57,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var updateCheckButton: Button
     private lateinit var updateDownloadButton: Button
     private lateinit var updateAutoSwitch: Switch
-    private lateinit var nfcRepairButton: Button
     private lateinit var nfcTagPrefSwitch: Switch
     private lateinit var nfcTagPrefStatusText: TextView
     private lateinit var nfcTagPrefOpenSettingsButton: Button
@@ -121,9 +120,6 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Button>(R.id.nfc_test_button).setOnClickListener {
             startActivity(Intent(this, NfcTestActivity::class.java))
         }
-
-        nfcRepairButton = findViewById(R.id.nfc_repair_button)
-        nfcRepairButton.setOnClickListener { repairNfcDispatchCache() }
 
         shizukuBanner = findViewById(R.id.shizuku_banner)
         shizukuStatusText = findViewById(R.id.shizuku_status_text)
@@ -324,10 +320,6 @@ class SettingsActivity : AppCompatActivity() {
             append(getString(R.string.settings_section_nfc_permission))
             append("\n")
             append(getString(R.string.settings_nfc_tag_pref_hint))
-            append("\n\n")
-            append(getString(R.string.settings_nfc_repair_button))
-            append("\n")
-            append(getString(R.string.settings_nfc_repair_hint))
         })
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.settings_help_title)
@@ -384,36 +376,6 @@ class SettingsActivity : AppCompatActivity() {
             onError = {
                 Toast.makeText(this, getString(R.string.settings_nfc_tag_pref_failed), Toast.LENGTH_LONG).show()
                 ShizukuUtils.openNfcTagAppPreferenceSettings(this)
-            }
-        )
-    }
-
-    /**
-     * "pm install -r" auf den eigenen APK-Pfad beendet den laufenden Prozess dieser App
-     * (Standardverhalten bei jeder Paket-Neuinstallation) - ein Erfolgs-Toast danach ist
-     * daher nicht zuverlaessig garantiert, deshalb wird VOR dem eigentlichen Aufruf schon
-     * angekuendigt, dass die App gleich neu startet, statt auf onResult zu warten.
-     */
-    private fun repairNfcDispatchCache() {
-        if (!ShizukuUtils.isShizukuAvailable() || !ShizukuUtils.hasPermission()) {
-            Toast.makeText(this, getString(R.string.settings_save_needs_shizuku), Toast.LENGTH_LONG).show()
-            return
-        }
-        nfcRepairButton.isEnabled = false
-        Toast.makeText(this, getString(R.string.settings_nfc_repair_running), Toast.LENGTH_SHORT).show()
-        ShizukuUtils.repairNfcDispatchCache(
-            context = this,
-            onResult = { ok ->
-                nfcRepairButton.isEnabled = true
-                Toast.makeText(
-                    this,
-                    getString(if (ok) R.string.settings_nfc_repair_done else R.string.settings_nfc_repair_failed),
-                    Toast.LENGTH_LONG
-                ).show()
-            },
-            onError = {
-                nfcRepairButton.isEnabled = true
-                Toast.makeText(this, getString(R.string.settings_nfc_repair_failed), Toast.LENGTH_LONG).show()
             }
         )
     }

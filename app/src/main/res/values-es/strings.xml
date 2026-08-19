@@ -26,11 +26,6 @@
     <string name="settings_nfc_unpair_button">Desemparejar anillo</string>
     <string name="settings_nfc_unpaired_toast">Emparejamiento eliminado</string>
     <string name="settings_nfc_test_button">Probar estabilidad del UID</string>
-    <string name="settings_nfc_repair_hint">AtlayaSwitch repara automáticamente en segundo plano la detección NFC del perfil que abandonas tras cada cambio que ella misma provoca (anillo o icono). Solo si el anillo no responde justo tras cambiar de perfil desde los ajustes rápidos del sistema (no desde AtlayaSwitch), toca aquí en vez de reiniciar todo el dispositivo. AtlayaSwitch se reiniciará brevemente, es normal.</string>
-    <string name="settings_nfc_repair_button">Reparar detección del anillo NFC</string>
-    <string name="settings_nfc_repair_running">Reparando…</string>
-    <string name="settings_nfc_repair_done">Listo. Prueba el anillo ahora.</string>
-    <string name="settings_nfc_repair_failed">Fallo – reinicia el dispositivo en su lugar.</string>
     <string name="settings_shizuku_not_installed_owner">Shizuku no está instalado – sin Shizuku el cambio de perfil no funciona. Lo mejor es instalarlo desde Play Store, luego toca aquí \"Abrir Shizuku\" y configura una vez \"Inicio mediante depuración inalámbrica\" (funciona enteramente en el dispositivo, sin PC).</string>
     <string name="settings_shizuku_not_installed_other">Shizuku no está instalado. Las opciones de desarrollador y la depuración inalámbrica solo son visibles en el perfil \"Propietario\" – instálalo y configúralo allí primero, luego se detectará automáticamente aquí.</string>
     <string name="settings_shizuku_install_button">Instalar Shizuku (Play Store)</string>

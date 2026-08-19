@@ -26,11 +26,6 @@
     <string name="settings_nfc_unpair_button">Unpair ring</string>
     <string name="settings_nfc_unpaired_toast">Pairing removed</string>
     <string name="settings_nfc_test_button">Test UID stability</string>
-    <string name="settings_nfc_repair_hint">AtlayaSwitch automatically repairs NFC detection in the background for the profile you leave after every switch it triggers itself (ring or icon). Only if the ring doesn\'t react right after switching via the system\'s quick settings (not via AtlayaSwitch), tap here instead of rebooting the whole device. AtlayaSwitch will briefly restart, that\'s expected.</string>
-    <string name="settings_nfc_repair_button">Repair NFC ring detection</string>
-    <string name="settings_nfc_repair_running">Repairing…</string>
-    <string name="settings_nfc_repair_done">Done. Try the ring now.</string>
-    <string name="settings_nfc_repair_failed">Failed – please reboot the device instead.</string>
     <string name="settings_shizuku_not_installed_owner">Shizuku is not installed – the profile switch won\'t work without it. Best installed from the Play Store; then tap \"Open Shizuku\" here and set up \"Start via Wireless debugging\" once (runs entirely on the device, no PC needed).</string>
     <string name="settings_shizuku_not_installed_other">Shizuku is not installed. Developer options and Wireless debugging are only visible in the \"Owner\" profile – install and set it up there first, it will then be detected here automatically.</string>
     <string name="settings_shizuku_install_button">Install Shizuku (Play Store)</string>

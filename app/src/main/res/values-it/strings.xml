@@ -26,11 +26,6 @@
     <string name="settings_nfc_unpair_button">Dissocia anello</string>
     <string name="settings_nfc_unpaired_toast">Associazione rimossa</string>
     <string name="settings_nfc_test_button">Testa stabilità UID</string>
-    <string name="settings_nfc_repair_hint">AtlayaSwitch ripara automaticamente in background il rilevamento NFC del profilo che lasci dopo ogni cambio innescato da lei stessa (anello o icona). Solo se l\'anello non reagisce subito dopo un cambio tramite le impostazioni rapide di sistema (non tramite AtlayaSwitch), tocca qui invece di riavviare l\'intero dispositivo. AtlayaSwitch si riavvierà brevemente, è normale.</string>
-    <string name="settings_nfc_repair_button">Ripara rilevamento anello NFC</string>
-    <string name="settings_nfc_repair_running">Riparazione…</string>
-    <string name="settings_nfc_repair_done">Fatto. Prova ora l\'anello.</string>
-    <string name="settings_nfc_repair_failed">Fallito – riavvia invece il dispositivo.</string>
     <string name="settings_shizuku_not_installed_owner">Shizuku non è installato – senza Shizuku il cambio di profilo non funziona. Meglio installarlo dal Play Store, poi tocca qui \"Apri Shizuku\" e configura una sola volta \"Avvio tramite debug wireless\" (funziona interamente sul dispositivo, senza PC).</string>
     <string name="settings_shizuku_not_installed_other">Shizuku non è installato. Le opzioni sviluppatore e il debug wireless sono visibili solo nel profilo \"Proprietario\" – installalo e configuralo prima lì, verrà poi rilevato automaticamente qui.</string>
     <string name="settings_shizuku_install_button">Installa Shizuku (Play Store)</string>

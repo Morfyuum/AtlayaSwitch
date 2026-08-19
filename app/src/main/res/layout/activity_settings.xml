@@ -192,22 +192,7 @@
             android:id="@+id/nfc_test_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_test_button"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_repair_hint"
-            android:textSize="14sp"
-            android:alpha="0.7"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/nfc_repair_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_repair_button" />
+            android:text="@string/settings_nfc_test_button" />
 
         <View
             android:layout_width="match_parent"

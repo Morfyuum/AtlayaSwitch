@@ -45,7 +45,24 @@ class UserService : IUserService.Stub() {
     }
 
     /**
-     * Siehe repairNfcDispatchCache() weiter unten fuer den Hintergrund des Tricks selbst.
+     * Baut den internen Tech-Dispatch-Cache des NFC-Diensts fuer das verlassene Profil
+     * neu auf, indem die App per "pm install -r --user <userId>" aus ihrem eigenen,
+     * bereits installierten APK-Pfad heraus fuer genau dieses eine Profil neu installiert
+     * wird (keine neue Datei noetig, "-r" behaelt alle Daten inkl. Ring-Kopplung, "--user"
+     * betrifft nur diese eine Profil-Instanz und toetet NICHT den gerade laufenden
+     * Prozess des Aufrufers - anders als ein "pm install -r" ohne --user auf das eigene,
+     * aktive Profil). Hintergrund: Nach einem GrapheneOS-Profilwechsel (unabhaengig vom
+     * Mechanismus - System-Schnelleinstellungen, "am switch-user", mit oder ohne
+     * Sitzungsende) liefert der NFC-Dienst fuer TECH_DISCOVERED-Tags im neu aktiven Profil
+     * "tryStartActivity: activities.size() = 0", obwohl Manifest, Tag-App-Freigabe und
+     * Stopped-Status der App nachweislich korrekt sind - nur ein kompletter Geraete-
+     * Neustart baute den Cache bisher zuverlaessig neu auf, ein Neustart nur des NFC-
+     * Diensts (Funk aus/an, "am force-stop com.android.nfc") half nicht. Ein "pm install
+     * -r" loest denselben PACKAGE_REPLACED-Broadcast aus wie ein echter Neustart es fuer
+     * diesen einen Cache tut, live verifiziert am 2026-08-19. Kein bekannter offizieller
+     * API-Weg dafuer - das ist ein Nebeneffekt-Workaround fuer einen vermuteten
+     * GrapheneOS/AOSP-Mehrbenutzer-Bug, kein dokumentiertes Verhalten.
+     *
      * Hier automatisch und lautlos auf das Profil angewendet, das gerade verlassen wird -
      * NIE auf das Zielprofil (koennte AtlayaSwitch dort ungewollt sichtbar installieren,
      * falls es dort noch nicht drauf ist - das widerspraeche dem Tarnprofil-Konzept, siehe
@@ -138,28 +155,6 @@ class UserService : IUserService.Stub() {
     override fun uninstallForUser(userId: Int, pkg: String): Boolean {
         val raw = runShellCommand("pm", "uninstall", "--user", userId.toString(), pkg)
         return raw.trim().equals("Success", ignoreCase = true)
-    }
-
-    /**
-     * Baut den internen Tech-Dispatch-Cache des NFC-Diensts fuer das aktuelle Profil neu
-     * auf, indem die App aus ihrem eigenen, bereits installierten APK-Pfad heraus per
-     * "pm install -r" neu installiert wird (keine neue Datei noetig, "-r" behaelt alle
-     * Daten inkl. Ring-Kopplung). Hintergrund: Nach einem GrapheneOS-Profilwechsel
-     * (unabhaengig vom Mechanismus - System-Schnelleinstellungen, "am switch-user", mit
-     * oder ohne Sitzungsende) liefert der NFC-Dienst fuer TECH_DISCOVERED-Tags im neu
-     * aktiven Profil "tryStartActivity: activities.size() = 0", obwohl Manifest, Tag-App-
-     * Freigabe und Stopped-Status der App nachweislich korrekt sind - nur ein kompletter
-     * Geraete-Neustart baute den Cache bisher zuverlaessig neu auf, ein Neustart nur des
-     * NFC-Diensts (Funk aus/an, "am force-stop com.android.nfc") half nicht. Ein "pm
-     * install -r" loest denselben PACKAGE_REPLACED-Broadcast aus wie ein echter Neustart
-     * es fuer diesen einen Cache tut, live verifiziert am 2026-08-19 (Ring funktionierte
-     * danach ohne Reboot wieder). Kein bekannter offizieller API-Weg dafuer - das ist ein
-     * Nebeneffekt-Workaround fuer einen vermuteten GrapheneOS/AOSP-Mehrbenutzer-Bug, kein
-     * dokumentiertes Verhalten.
-     */
-    override fun repairNfcDispatchCache(apkPath: String): Boolean {
-        val result = runShellCommand("pm", "install", "-r", apkPath)
-        return result.trim().equals("Success", ignoreCase = true)
     }
 
     /**
