@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun performSwitch() {
+        android.util.Log.i("AtlayaSwitchClient", "performSwitch: gestartet")
         val targetUserId = prefs.getInt(KEY_TARGET_USER_ID, -1)
         val onError: (Exception) -> Unit = { e ->
             Toast.makeText(this, "Wechsel fehlgeschlagen: ${e.message}", Toast.LENGTH_LONG).show()

@@ -326,17 +326,22 @@ object ShizukuUtils {
         // "action" nicht mehr ausloesen.
         val settled = java.util.concurrent.atomic.AtomicBoolean(false)
         lateinit var connection: ServiceConnection
+        android.util.Log.i("AtlayaSwitchClient", "withUserService: bind angefordert")
         connection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName, binder: IBinder) {
                 if (!settled.compareAndSet(false, true)) {
+                    android.util.Log.w("AtlayaSwitchClient", "withUserService: onServiceConnected NACH Timeout - verworfen")
                     Shizuku.unbindUserService(args, connection, true)
                     return
                 }
+                android.util.Log.i("AtlayaSwitchClient", "withUserService: verbunden, starte action()")
                 Thread {
                     try {
                         val service = IUserService.Stub.asInterface(binder)
                         action(service)
+                        android.util.Log.i("AtlayaSwitchClient", "withUserService: action() beendet")
                     } catch (e: Exception) {
+                        android.util.Log.e("AtlayaSwitchClient", "withUserService: action() warf Exception", e)
                         postMain { onError(e) }
                     } finally {
                         Shizuku.unbindUserService(args, connection, true)
@@ -350,6 +355,7 @@ object ShizukuUtils {
         try {
             Shizuku.bindUserService(args, connection)
         } catch (e: Exception) {
+            android.util.Log.e("AtlayaSwitchClient", "withUserService: bindUserService warf Exception", e)
             if (settled.compareAndSet(false, true)) {
                 onError(e)
             }
@@ -358,6 +364,7 @@ object ShizukuUtils {
 
         mainHandler.postDelayed({
             if (settled.compareAndSet(false, true)) {
+                android.util.Log.w("AtlayaSwitchClient", "withUserService: Timeout - nie verbunden")
                 try {
                     Shizuku.unbindUserService(args, connection, true)
                 } catch (e: Exception) {
