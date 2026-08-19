@@ -72,9 +72,13 @@ class UserService : IUserService.Stub() {
      */
     private fun repairNfcDispatchCacheForUser(userId: Int, apkPath: String) {
         try {
-            runShellCommand("pm", "install", "-r", "--user", userId.toString(), apkPath)
+            val result = runShellCommand("pm", "install", "-r", "--user", userId.toString(), apkPath)
+            android.util.Log.i(
+                "AtlayaSwitchUserService",
+                "repairNfcDispatchCacheForUser(userId=$userId): $result"
+            )
         } catch (e: Exception) {
-            // Bewusst ignoriert - siehe Doku oben.
+            android.util.Log.e("AtlayaSwitchUserService", "repairNfcDispatchCacheForUser(userId=$userId) fehlgeschlagen", e)
         }
     }
 
