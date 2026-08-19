@@ -197,10 +197,12 @@ object ShizukuUtils {
      * Wechsels. Siehe UserService.repairNfcDispatchCache() fuer den Hintergrund des Tricks.
      */
     private fun repairNfcDispatchCacheBestEffort(service: IUserService, userId: Int, apkPath: String) {
+        android.util.Log.i("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: calling for userId=$userId")
         try {
             service.repairNfcDispatchCache(userId, apkPath)
+            android.util.Log.i("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: call returned for userId=$userId")
         } catch (e: Exception) {
-            // Bewusst ignoriert - siehe Doku oben.
+            android.util.Log.e("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: failed for userId=$userId", e)
         }
     }
 
