@@ -28,8 +28,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- CATEGORY_DEFAULT ist hier Pflicht: Androids Tag-Dispatcher startet Activities
+                 wie startActivity()/MATCH_DEFAULT_ONLY - ohne diese Kategorie findet er beim
+                 Hintergrund-Scan (App nicht offen) trotz korrektem Filter und TagAppPreference
+                 keine Kandidaten (tryStartActivity: activities.size() = 0, per Logcat bestaetigt).
+                 enableForegroundDispatch() (Testmodus/Settings) umgeht diese Abfrage und
+                 funktionierte daher schon vorher, ohne den fehlenden Kategorie-Eintrag zu zeigen. -->
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
                 android:name="android.nfc.action.TECH_DISCOVERED"
