@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature
-        android:name="android.hardware.nfc"
-        android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -16,8 +12,7 @@
         android:localeConfig="@xml/locales_config"
         android:exported="false">
 
-        <!-- Startet den Wechsel beim Antippen des App-Icons ODER beim Scannen eines
-             gekoppelten NFC-Rings (nur bei UID-Treffer, siehe MainActivity.handleNfcLaunch) -->
+        <!-- Startet den Wechsel beim Antippen des App-Icons -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,22 +23,9 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- CATEGORY_DEFAULT ist hier Pflicht: Androids Tag-Dispatcher startet Activities
-                 wie startActivity()/MATCH_DEFAULT_ONLY - ohne diese Kategorie findet er beim
-                 Hintergrund-Scan (App nicht offen) trotz korrektem Filter und TagAppPreference
-                 keine Kandidaten (tryStartActivity: activities.size() = 0, per Logcat bestaetigt).
-                 enableForegroundDispatch() (Testmodus/Settings) umgeht diese Abfrage und
-                 funktionierte daher schon vorher, ohne den fehlenden Kategorie-Eintrag zu zeigen. -->
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <meta-data
-                android:name="android.nfc.action.TECH_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter" />
         </activity>
 
-        <!-- Einstellungen: Zielprofil + NFC-Ring-Kopplung. Direkt startbar UND über
+        <!-- Einstellungen: Zielprofil wählen. Direkt startbar UND über
              die "App-Info"-Seite der Systemeinstellungen erreichbar
              (ACTION_APPLICATION_PREFERENCES zeigt dort automatisch einen
              "Einstellungen"-Link an), damit kein eigenes auffälliges Menü nötig ist. -->
@@ -57,17 +39,6 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <!-- Test-Modus: prüft vor jeder Trigger-Umsetzung, ob die UID des Chips fest oder rotierend ist -->
-        <activity
-            android:name=".NfcTestActivity"
-            android:exported="true"
-            android:label="@string/nfc_test_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

@@ -6,12 +6,11 @@
 
 One tap on the app icon, and your phone shows only what it's supposed to show.
 
-AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switches instantly and without any visible menu to a predefined, deliberately unremarkable user profile — with a single tap on the app icon (or optionally an NFC ring) — for moments when a device might be briefly inspected or checked, without the action itself looking suspicious.
+AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switches instantly and without any visible menu to a predefined, deliberately unremarkable user profile — with a single tap on the app icon — for moments when a device might be briefly inspected or checked, without the action itself looking suspicious.
 
 **Benefits:**
 - No root required — uses only [Shizuku's](https://shizuku.rikka.app/) ADB shell privileges, GrapheneOS' security model stays fully intact
 - No visible picker menu, no spoken codeword — switches in under a second
-- Optional NFC ring trigger, works while the screen is on and unlocked
 - The way back stays the regular, password-protected GrapheneOS profile switch — no new attack surface
 - Automatically detects if it's accidentally installed in the decoy profile itself (which would give the trick away) and offers one-tap removal
 - Fully offline, no cloud, no trackers
@@ -19,7 +18,7 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 ## How it works
 
 - **MainActivity** immediately performs the switch to the saved target profile on launch (no visible UI) and then closes itself.
-- **SettingsActivity** lists all existing GrapheneOS profiles, saves the selection as the target user ID, and manages NFC ring pairing. Reachable via System Settings -> Apps -> AtlayaSwitch -> App info (a "Settings" link appears there automatically, see section below) instead of a menu of its own.
+- **SettingsActivity** lists all existing GrapheneOS profiles and saves the selection as the target user ID. Reachable via System Settings -> Apps -> AtlayaSwitch -> App info (a "Settings" link appears there automatically, see section below) instead of a menu of its own.
 - Since `Shizuku.newProcess()` is no longer publicly accessible in current Shizuku versions, the actual execution of `pm list users` / `am switch-user <id>` runs in a `UserService` process started via `Shizuku.bindUserService` with shell privileges (UID 2000). The app itself stays unprivileged, without `sharedUserId` and without root.
 
 ## Setup
@@ -76,13 +75,13 @@ Shizuku itself only needs to be started once via ADB (in the "Owner" profile, si
 
 ## Reaching settings via App info
 
-AtlayaSwitch deliberately has no menu of its own that stands out via the app icon or the app overview. All settings (target profile, NFC ring pairing) live in **SettingsActivity**, reachable via:
+AtlayaSwitch deliberately has no menu of its own that stands out via the app icon or the app overview. All settings (target profile) live in **SettingsActivity**, reachable via:
 
 Android Settings -> Apps -> AtlayaSwitch -> App info -> "Settings" (appears there automatically because `SettingsActivity` declares the `android.intent.action.APPLICATION_PREFERENCES` intent).
 
 Alternatively, start it directly: `adb shell am start -n com.capecter.atlayaswitch/.SettingsActivity`.
 
-Target profile selection and NFC ring pairing still save immediately on tap (SharedPreferences). At the bottom of the page there are also "Back" and "Save" buttons — "Save" is the only step with a real effect on the system (sets the NFC start permission, see below), making it visible when something is actually changed on the system rather than just locally in the app.
+Target profile selection saves immediately on tap (SharedPreferences). A "Back" button at the bottom of the page returns to where you came from.
 
 ## Guided Shizuku setup (v1.6)
 
@@ -102,40 +101,6 @@ The pairing-code coupling itself has always run entirely on the device (Shizuku'
 ## Update check
 
 In **SettingsActivity** under "Updates": the "Check now" button reads `https://atlaya.capecter.com/atlayaswitch/updates/latest.json` and compares the version listed there with the installed one. The "Check automatically on open" toggle (default: off) does this automatically when opening Settings. If an update is available, a "Download" button appears that opens the download page in the browser — AtlayaSwitch doesn't download or install anything itself.
-
-## Pairing an NFC ring
-
-In **SettingsActivity** under "NFC ring":
-
-1. Tap "Pair ring" -> status changes to "Now hold the ring to the phone…".
-2. Hold the ring to the phone once -> the UID is saved locally as a hex string in SharedPreferences (`atlaya_switch` / `paired_nfc_uid`), no cloud sync.
-3. "Unpair ring" deletes the saved UID again.
-
-Once paired, the trigger works immediately: holding the ring to the phone while the screen is on and unlocked triggers the same profile switch as tapping the app icon. With a wrong/unrecognized tag (no UID match) nothing happens and there's no feedback at all — deliberately so the trigger stays inconspicuous. This requires a confirmed **stable** UID from the stability test (see below); it won't work with a rotating chip. **In addition**, the NFC start permission must be on (next section) — without it the ring stays silent even though pairing and the stability test are fine.
-
-**Screen must be on and unlocked:** with the screen locked or off, Android's NFC controller stops polling for external tags entirely (confirmed via `dumpsys nfc`/logcat: zero read activity in that state) — this is a platform-level anti-skimming measure that applies to every app, not something AtlayaSwitch can selectively bypass just for the paired ring, since the chip never even attempts to read a tag's UID while locked. The ring trigger therefore only works in the moment the phone is already unlocked and in use.
-
-## NFC start permission (Android system toggle, per profile)
-
-Since Android 14, the system requires a separate, explicit grant for **every** app and **every** profile before it may be launched just by holding up an NFC tag ("Tag App Preference", internally visible in `dumpsys nfc` as `TagAppPreference:` per `userId`). New apps always start out **"Not allowed"** here — regardless of whether the manifest, pairing and stability test are correct. Without this grant, Android silently drops the tag intent before the app even gets a chance to react (this was the actual cause of the trigger not reacting at first after the initial setup).
-
-Visible/toggleable under: Settings -> Connected devices -> NFC -> "Start via NFC" (or directly: `adb shell am start -a android.nfc.action.CHANGE_TAG_INTENT_PREFERENCE`) -> AtlayaSwitch -> "Allow start on NFC scan" toggle.
-
-Since v1.5 this can also be done directly in **SettingsActivity** under "NFC start permission": the toggle shows the current system status for the currently active profile, "Save" flips it (via the privileged Shizuku UserService, no need to manually navigate into system settings). If the automatic toggle fails for any reason, the app automatically opens the system setting as a fallback for toggling manually. **Important:** this grant applies per profile separately — if the ring is used in multiple profiles, it has to be set in each one individually.
-
-## NFC UID stability test (groundwork for the NFC trigger)
-
-Before an NFC chip (e.g. a payment ring) can be used as an additional profile-switch trigger, it has to be checked whether it sends a fixed or a randomized (privacy-motivated, per-scan-changing) UID when scanned — a trigger only makes sense with a fixed UID.
-
-1. Tap "Test UID stability" in **SettingsActivity** (or directly: `adb shell am start -n com.capecter.atlayaswitch/.NfcTestActivity`).
-2. Hold the NFC chip to the phone once -> scan 1 is shown.
-3. Hold the same chip to the phone a second time -> scan 2 is shown.
-4. Result:
-   - **"Stable – trigger possible"**: both UIDs are identical, an NFC trigger can be built.
-   - **"Rotating – trigger NOT possible"**: the UIDs differ, the chip randomizes its UID per scan — a UID-based trigger won't work with it.
-5. "Retest" resets both scans.
-
-Only `Tag.getId()` (the low-level anticollision UID) is read — no `IsoDep.transceive`, no payment application is addressed, and nothing is written to the chip.
 
 ## Wireless ADB connection
 

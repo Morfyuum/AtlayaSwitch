@@ -1,11 +1,7 @@
 package com.capecter.atlayaswitch
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.content.SharedPreferences
-import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,10 +26,10 @@ import rikka.shizuku.Shizuku
 import java.util.Locale
 
 /**
- * Zentrale Einstellungen von AtlayaSwitch: Zielprofil wählen und den NFC-Ring
- * koppeln. Erreichbar über die "App-Info"-Seite der Systemeinstellungen
- * (Intent-Filter ACTION_APPLICATION_PREFERENCES), damit im Alltag kein
- * eigenes, auffälliges Menü nötig ist.
+ * Zentrale Einstellungen von AtlayaSwitch: Zielprofil wählen. Erreichbar über
+ * die "App-Info"-Seite der Systemeinstellungen (Intent-Filter
+ * ACTION_APPLICATION_PREFERENCES), damit im Alltag kein eigenes, auffälliges
+ * Menü nötig ist.
  */
 class SettingsActivity : AppCompatActivity() {
 
@@ -45,9 +41,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var switchModeGroup: RadioGroup
     private lateinit var languageButton: Button
     private lateinit var helpButton: Button
-    private lateinit var nfcStatusText: TextView
-    private lateinit var pairButton: Button
-    private lateinit var unpairButton: Button
     private lateinit var shizukuBanner: View
     private lateinit var shizukuStatusText: TextView
     private lateinit var openShizukuButton: Button
@@ -57,14 +50,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var updateCheckButton: Button
     private lateinit var updateDownloadButton: Button
     private lateinit var updateAutoSwitch: Switch
-    private lateinit var nfcTagPrefSwitch: Switch
-    private lateinit var nfcTagPrefStatusText: TextView
-    private lateinit var nfcTagPrefOpenSettingsButton: Button
-    private lateinit var saveButton: Button
     private lateinit var backButton: Button
 
-    private var nfcAdapter: NfcAdapter? = null
-    private var pairingModeActive = false
     private var profileAdapter: ProfileAdapter? = null
     private var latestUpdateUrl: String? = null
     private var lastShizukuStateRefreshMs = 0L
@@ -111,16 +98,6 @@ class SettingsActivity : AppCompatActivity() {
                 .apply()
         }
 
-        nfcStatusText = findViewById(R.id.nfc_status_text)
-        pairButton = findViewById(R.id.nfc_pair_button)
-        unpairButton = findViewById(R.id.nfc_unpair_button)
-
-        pairButton.setOnClickListener { startPairing() }
-        unpairButton.setOnClickListener { unpair() }
-        findViewById<Button>(R.id.nfc_test_button).setOnClickListener {
-            startActivity(Intent(this, NfcTestActivity::class.java))
-        }
-
         shizukuBanner = findViewById(R.id.shizuku_banner)
         shizukuStatusText = findViewById(R.id.shizuku_status_text)
         openShizukuButton = findViewById(R.id.shizuku_open_button)
@@ -147,21 +124,8 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit().putBoolean(KEY_AUTO_UPDATE_CHECK, checked).apply()
         }
 
-        nfcTagPrefSwitch = findViewById(R.id.nfc_tag_pref_switch)
-        nfcTagPrefStatusText = findViewById(R.id.nfc_tag_pref_status_text)
-        nfcTagPrefOpenSettingsButton = findViewById(R.id.nfc_tag_pref_open_settings_button)
-        nfcTagPrefOpenSettingsButton.setOnClickListener {
-            ShizukuUtils.openNfcTagAppPreferenceSettings(this)
-        }
-        nfcTagPrefStatusText.text = getString(R.string.settings_nfc_tag_pref_status_unknown)
-
-        saveButton = findViewById(R.id.settings_save_button)
         backButton = findViewById(R.id.settings_back_button)
-        saveButton.setOnClickListener { saveSettings() }
         backButton.setOnClickListener { finish() }
-
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-        updateNfcStatus()
 
         Shizuku.addRequestPermissionResultListener(permissionListener)
         refreshShizukuState()
@@ -176,18 +140,6 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         refreshShizukuState()
-
-        val adapter = nfcAdapter ?: return
-        if (!adapter.isEnabled) return
-
-        val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.FLAG_MUTABLE
-        } else {
-            0
-        }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, flags)
-        adapter.enableForegroundDispatch(this, pendingIntent, null, null)
     }
 
     /**
@@ -202,7 +154,7 @@ class SettingsActivity : AppCompatActivity() {
     /**
      * Entprellt wiederholte Aufrufe (z.B. onCreate direkt gefolgt von onResume, oder
      * schnelles Verlassen/Zurueckkehren beim Testen): jeder Durchlauf startet mehrere
-     * eigene Shizuku-UserService-Binds (loadProfiles + refreshNfcTagPrefState), die auf
+     * eigene Shizuku-UserService-Binds (loadProfiles), die auf
      * diesem Geraet durch eine SELinux-Restriktion ohnehin schon langsam sind - ohne
      * Entprellung stapeln sich bei mehrfachem Aufruf binnen kurzer Zeit viele
      * ueberlappende Binds, was den Shizuku-Dienst zusaetzlich verstopft.
@@ -246,14 +198,12 @@ class SettingsActivity : AppCompatActivity() {
                     switchProfileButton.visibility = View.VISIBLE
                 }
             }
-            nfcTagPrefStatusText.text = getString(R.string.settings_nfc_tag_pref_status_unknown)
             return
         }
         shizukuBanner.visibility = View.GONE
 
         if (ShizukuUtils.hasPermission()) {
             loadProfiles()
-            refreshNfcTagPrefState()
         } else {
             ShizukuUtils.requestPermission()
         }
@@ -288,10 +238,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Setzt den Hilfetext aus den ohnehin schon uebersetzten Bausteinen der Sektionen
-     * "Verhalten beim Wechsel" und "NFC-Start-Berechtigung" zusammen, statt sie im
-     * Hilfetext selbst noch einmal zu uebersetzen - eine Quelle der Wahrheit pro Sprache,
-     * kein Auseinanderlaufen zwischen Bildschirmtext und Hilfetext moeglich.
+     * Setzt den Hilfetext aus den ohnehin schon uebersetzten Bausteinen der Sektion
+     * "Verhalten beim Wechsel" zusammen, statt sie im Hilfetext selbst noch einmal zu
+     * uebersetzen - eine Quelle der Wahrheit pro Sprache, kein Auseinanderlaufen
+     * zwischen Bildschirmtext und Hilfetext moeglich.
      */
     private fun showHelpDialog() {
         val copyrightPrefix = getString(R.string.settings_help_copyright_prefix)
@@ -316,10 +266,6 @@ class SettingsActivity : AppCompatActivity() {
             append(getString(R.string.settings_switch_mode_end_session))
             append(": ")
             append(getString(R.string.settings_switch_mode_end_session_hint))
-            append("\n\n")
-            append(getString(R.string.settings_section_nfc_permission))
-            append("\n")
-            append(getString(R.string.settings_nfc_tag_pref_hint))
         })
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.settings_help_title)
@@ -329,55 +275,6 @@ class SettingsActivity : AppCompatActivity() {
         // setMessage() allein macht Spans nicht klickbar - erst das MovementMethod
         // auf der tatsaechlichen Dialog-TextView aktiviert den URLSpan-Tap.
         dialog.findViewById<TextView>(android.R.id.message)?.movementMethod = LinkMovementMethod.getInstance()
-    }
-
-    /** Liest den aktuellen Systemstatus der TagAppPreference und stellt den Schalter
-     * darauf ein, ohne dass dieses Setzen selbst als Nutzeraenderung gilt. */
-    private fun refreshNfcTagPrefState() {
-        ShizukuUtils.getNfcTagAppPreference(
-            context = this,
-            onResult = { allowed ->
-                nfcTagPrefSwitch.isChecked = allowed
-                nfcTagPrefStatusText.text = getString(
-                    if (allowed) R.string.settings_nfc_tag_pref_status_on
-                    else R.string.settings_nfc_tag_pref_status_off
-                )
-            },
-            onError = {
-                nfcTagPrefStatusText.text = getString(R.string.settings_nfc_tag_pref_status_unknown)
-            }
-        )
-    }
-
-    /**
-     * Einziger expliziter "Commit"-Schritt auf dieser Seite: Zielprofil und
-     * NFC-Kopplung speichern zwar schon beim Antippen sofort (SharedPreferences),
-     * aber die System-NFC-Freigabe ist eine echte, sichtbare Aktion mit Rueckfallweg -
-     * dafuer braucht es einen eindeutigen Knopf statt eines stillen Auto-Apply.
-     */
-    private fun saveSettings() {
-        if (!ShizukuUtils.isShizukuAvailable() || !ShizukuUtils.hasPermission()) {
-            Toast.makeText(this, getString(R.string.settings_save_needs_shizuku), Toast.LENGTH_LONG).show()
-            return
-        }
-        val desired = nfcTagPrefSwitch.isChecked
-        ShizukuUtils.setNfcTagAppPreference(
-            context = this,
-            allow = desired,
-            onResult = { ok ->
-                if (ok) {
-                    Toast.makeText(this, getString(R.string.settings_saved_toast), Toast.LENGTH_SHORT).show()
-                    refreshNfcTagPrefState()
-                } else {
-                    Toast.makeText(this, getString(R.string.settings_nfc_tag_pref_failed), Toast.LENGTH_LONG).show()
-                    ShizukuUtils.openNfcTagAppPreferenceSettings(this)
-                }
-            },
-            onError = {
-                Toast.makeText(this, getString(R.string.settings_nfc_tag_pref_failed), Toast.LENGTH_LONG).show()
-                ShizukuUtils.openNfcTagAppPreferenceSettings(this)
-            }
-        )
     }
 
     private fun checkForUpdates() {
@@ -400,58 +297,6 @@ class SettingsActivity : AppCompatActivity() {
                 updateStatusText.text = getString(R.string.settings_update_status_error, e.message ?: "")
             }
         )
-    }
-
-    override fun onPause() {
-        super.onPause()
-        nfcAdapter?.disableForegroundDispatch(this)
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        if (!pairingModeActive) return
-
-        val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        }
-        val uid = tag?.id?.let { bytes -> bytes.joinToString("") { "%02X".format(it) } } ?: return
-
-        prefs.edit().putString(KEY_PAIRED_NFC_UID, uid).apply()
-        pairingModeActive = false
-        Toast.makeText(this, getString(R.string.settings_nfc_pair_done), Toast.LENGTH_SHORT).show()
-        updateNfcStatus()
-    }
-
-    private fun startPairing() {
-        if (nfcAdapter == null) {
-            Toast.makeText(this, R.string.nfc_test_no_hardware, Toast.LENGTH_LONG).show()
-            return
-        }
-        if (nfcAdapter?.isEnabled != true) {
-            Toast.makeText(this, R.string.nfc_test_disabled, Toast.LENGTH_LONG).show()
-            return
-        }
-        pairingModeActive = true
-        nfcStatusText.text = getString(R.string.settings_nfc_pair_waiting)
-    }
-
-    private fun unpair() {
-        prefs.edit().remove(KEY_PAIRED_NFC_UID).apply()
-        Toast.makeText(this, R.string.settings_nfc_unpaired_toast, Toast.LENGTH_SHORT).show()
-        updateNfcStatus()
-    }
-
-    private fun updateNfcStatus() {
-        val pairedUid = prefs.getString(KEY_PAIRED_NFC_UID, null)
-        nfcStatusText.text = if (pairedUid != null) {
-            getString(R.string.settings_nfc_paired, pairedUid)
-        } else {
-            getString(R.string.settings_nfc_not_paired)
-        }
-        unpairButton.isEnabled = pairedUid != null
     }
 
     private fun loadProfiles() {
@@ -559,7 +404,6 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val KEY_PAIRED_NFC_UID = "paired_nfc_uid"
         const val KEY_AUTO_UPDATE_CHECK = "auto_update_check"
         const val KEY_SWITCH_MODE = "switch_mode"
         const val SWITCH_MODE_SWITCH_ONLY = "switch_only"

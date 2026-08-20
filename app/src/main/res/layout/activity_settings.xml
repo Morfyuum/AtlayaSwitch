@@ -162,96 +162,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_section_nfc"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:id="@+id/nfc_status_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/nfc_pair_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_pair_button"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/nfc_unpair_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_unpair_button"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/nfc_test_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_test_button" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#33FFFFFF"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_section_nfc_permission"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/settings_nfc_tag_pref_label"
-                android:textSize="16sp" />
-
-            <Switch
-                android:id="@+id/nfc_tag_pref_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/nfc_tag_pref_status_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/nfc_tag_pref_open_settings_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_nfc_tag_pref_open_settings_button" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#33FFFFFF"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="@string/settings_section_updates"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -313,28 +223,11 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp" />
 
-        <LinearLayout
+        <Button
+            android:id="@+id/settings_back_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/settings_back_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="@string/settings_back_button" />
-
-            <Button
-                android:id="@+id/settings_save_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="@string/settings_save_button"
-                android:backgroundTint="#2E7D32" />
-        </LinearLayout>
+            android:text="@string/settings_back_button" />
 
     </LinearLayout>
 </ScrollView>

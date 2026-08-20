@@ -152,11 +152,8 @@ object ShizukuUtils {
         onDone: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        val apkPath = context.applicationContext.applicationInfo.sourceDir
-        val sourceUserId = currentProfileUserId()
         withUserService(context, onError) { service ->
             service.switchUser(userId)
-            repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
             postMain { onDone() }
         }
     }
@@ -169,7 +166,7 @@ object ShizukuUtils {
      * siehe UserService.switchUserAndEndSession() für die Details/Grenzen (v.a. Profil
      * "Eigentümer" laesst sich als Android-Systemnutzer nicht stoppen). onDone liefert
      * mit, ob das Beenden geklappt hat; der Aufrufer entscheidet, ob das dem Nutzer
-     * angezeigt wird - im stillen NFC-/App-Icon-Trigger (MainActivity) bewusst nicht,
+     * angezeigt wird - im stillen App-Icon-Trigger (MainActivity) bewusst nicht,
      * um unauffällig zu bleiben.
      */
     fun switchToUserAndEndSession(
@@ -179,71 +176,9 @@ object ShizukuUtils {
         onDone: (endSessionSucceeded: Boolean) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        val apkPath = context.applicationContext.applicationInfo.sourceDir
         withUserService(context, onError) { service ->
             val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
-            repairNfcDispatchCacheBestEffort(service, sourceUserId, apkPath)
             postMain { onDone(ok) }
-        }
-    }
-
-    /**
-     * Reparatur als EIGENER, zweiter Binder-Aufruf ueber die bereits verbundene Instanz,
-     * bewusst VOR dem postMain{onDone(...)} des primaeren Wechsels aufgerufen - nicht danach.
-     * Grund: MainActivity ruft in onDone sofort finish() auf; da die Activity noHistory/
-     * excludeFromRecents ist, killt Android den App-Prozess sehr bald danach. Ein NACH
-     * postMain{} platzierter Aufruf wurde dadurch beim Testen (2026-08-19) regelmaessig
-     * mitgetoetet, bevor er je feuern konnte - keine Logs, kein Fehler, einfach nichts.
-     * Der sichtbare Wechsel selbst wird davon nicht verlangsamt: "am switch-user" (bzw.
-     * switchUserAndEndSession() komplett) ist zu diesem Zeitpunkt bereits durchgelaufen,
-     * die Systemumschaltung passiert unabhaengig vom Zeitpunkt, an dem sich diese App
-     * selbst beendet - nur der App-Prozess bleibt dadurch im Hintergrund des verlassenen
-     * Profils ein bis zwei Sekunden laenger am Leben. Fehlschlaege bewusst ignoriert - das
-     * ist ein Best-Effort-Kosmetikschritt fuer's naechste Mal, kein Teil des eigentlichen
-     * Wechsels. Siehe UserService.repairNfcDispatchCache() fuer den Hintergrund des Tricks.
-     */
-    private fun repairNfcDispatchCacheBestEffort(service: IUserService, userId: Int, apkPath: String) {
-        android.util.Log.i("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: calling for userId=$userId")
-        try {
-            service.repairNfcDispatchCache(userId, apkPath)
-            android.util.Log.i("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: call returned for userId=$userId")
-        } catch (e: Exception) {
-            android.util.Log.e("AtlayaSwitchClient", "repairNfcDispatchCacheBestEffort: failed for userId=$userId", e)
-        }
-    }
-
-    /**
-     * Liest, ob AtlayaSwitch im aktuellen Profil per NFC-Scan gestartet werden darf
-     * (Android-14-Systemeinstellung "TagAppPreference", separat pro Profil).
-     */
-    fun getNfcTagAppPreference(
-        context: Context,
-        onResult: (Boolean) -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        val userId = currentProfileUserId()
-        withUserService(context, onError) { service ->
-            val allowed = service.getNfcTagAppPreference(userId, context.packageName)
-            postMain { onResult(allowed) }
-        }
-    }
-
-    /**
-     * Schaltet die Freigabe für das aktuelle Profil um. onResult(false) bedeutet:
-     * der Versuch ist fehlgeschlagen (z.B. weil das Geraet die API nicht hat) -
-     * der Aufrufer sollte dann openNfcTagAppPreferenceSettings() als manuellen
-     * Rückfallweg anbieten.
-     */
-    fun setNfcTagAppPreference(
-        context: Context,
-        allow: Boolean,
-        onResult: (Boolean) -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        val userId = currentProfileUserId()
-        withUserService(context, onError) { service ->
-            val ok = service.setNfcTagAppPreference(userId, context.packageName, allow)
-            postMain { onResult(ok) }
         }
     }
 
@@ -280,25 +215,12 @@ object ShizukuUtils {
         }
     }
 
-    /**
-     * Öffnet Androids eigenen Einstellungsbildschirm ("Über NFC starten"), auf dem
-     * sich die TagAppPreference auch von Hand umschalten lässt - Rückfallweg, falls
-     * die privilegierte Direktschaltung über Shizuku scheitert.
-     */
-    fun openNfcTagAppPreferenceSettings(context: Context) {
-        try {
-            context.startActivity(Intent("android.nfc.action.CHANGE_TAG_INTENT_PREFERENCE"))
-        } catch (e: Exception) {
-            // Bildschirm auf diesem Geraet nicht vorhanden - nichts weiter zu tun.
-        }
-    }
-
     private fun userServiceArgs(context: Context): Shizuku.UserServiceArgs {
         return Shizuku.UserServiceArgs(ComponentName(context.packageName, UserService::class.java.name))
             .daemon(false)
             .processNameSuffix("privileged")
             .debuggable(false)
-            .version(4)
+            .version(5)
     }
 
     /**

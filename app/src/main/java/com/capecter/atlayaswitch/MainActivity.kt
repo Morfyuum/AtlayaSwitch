@@ -2,18 +2,14 @@ package com.capecter.atlayaswitch
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.nfc.NfcAdapter
-import android.nfc.Tag
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import rikka.shizuku.Shizuku
 
 /**
- * Startet entweder per App-Icon-Tap (LAUNCHER-Intent, immer aktiv) oder per NFC-Scan
- * eines gekoppelten Rings (TECH_DISCOVERED-Intent, nur bei UID-Treffer aktiv). Beide
- * Wege führen zum selben Profilwechsel - kein sichtbares UI, beendet sich danach selbst.
+ * Startet per App-Icon-Tap (LAUNCHER-Intent) und führt sofort den Profilwechsel aus -
+ * kein sichtbares UI, beendet sich danach selbst.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -32,35 +28,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = getSharedPreferences("atlaya_switch", MODE_PRIVATE)
-
-        if (intent?.action == NfcAdapter.ACTION_TECH_DISCOVERED) {
-            handleNfcLaunch(intent)
-            return
-        }
-
-        startSwitchFlow()
-    }
-
-    /**
-     * Nur bei erkanntem, gekoppeltem Ring geht es weiter - bei jedem anderen Tag
-     * (falscher Ring, fremde Karte) schließt sich die App sofort und lautlos, ohne
-     * jede Rückmeldung. Das ist Absicht: ein NFC-Trigger soll unauffällig bleiben,
-     * niemand soll aus einer Fehlermeldung erfahren, dass es diesen Trigger gibt.
-     */
-    private fun handleNfcLaunch(intent: Intent) {
-        val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        }
-        val scannedUid = tag?.id?.let { bytes -> bytes.joinToString("") { "%02X".format(it) } }
-        val pairedUid = prefs.getString(SettingsActivity.KEY_PAIRED_NFC_UID, null)
-
-        if (scannedUid == null || pairedUid == null || !scannedUid.equals(pairedUid, ignoreCase = true)) {
-            finish()
-            return
-        }
 
         startSwitchFlow()
     }
