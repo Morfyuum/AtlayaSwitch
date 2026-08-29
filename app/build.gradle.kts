@@ -65,4 +65,8 @@ dependencies {
     // Shizuku: erlaubt Ausführung von Shell-Befehlen mit ADB-Shell-Rechten ohne Root
     implementation("dev.rikka.shizuku:api:13.1.5")
     implementation("dev.rikka.shizuku:provider:13.1.5")
+
+    // Periodischer Hintergrund-Update-Check (UpdateCheckWorker) + System-Benachrichtigung,
+    // auch wenn die App geschlossen ist - siehe UpdateCheckWorker.kt.
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 }

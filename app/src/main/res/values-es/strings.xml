@@ -34,4 +34,10 @@
     <string name="settings_update_check_button">Comprobar ahora</string>
     <string name="settings_update_download_button">Descargar</string>
     <string name="settings_update_auto_label">Comprobar automáticamente al abrir</string>
+    <string name="settings_update_background_label">Comprobar periódicamente en segundo plano (notificación)</string>
+    <string name="update_notification_channel_name">Actualización disponible</string>
+    <string name="update_notification_title">Actualización de AtlayaSwitch disponible</string>
+    <string name="update_notification_text">La versión %1$s está disponible – toca para descargar</string>
+    <string name="settings_section_support">Soporte</string>
+    <string name="settings_support_button">Contactar con soporte</string>
 </resources>

@@ -49,4 +49,10 @@
     <string name="settings_update_check_button">Jetzt prüfen</string>
     <string name="settings_update_download_button">Herunterladen</string>
     <string name="settings_update_auto_label">Beim Öffnen automatisch prüfen</string>
+    <string name="settings_update_background_label">Im Hintergrund regelmäßig prüfen (Benachrichtigung)</string>
+    <string name="update_notification_channel_name">Update verfügbar</string>
+    <string name="update_notification_title">AtlayaSwitch-Update verfügbar</string>
+    <string name="update_notification_text">Version %1$s ist verfügbar – antippen zum Herunterladen</string>
+    <string name="settings_section_support">Support</string>
+    <string name="settings_support_button">Support kontaktieren</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.capecter.atlayaswitch
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,14 +19,22 @@ import android.widget.RadioGroup
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Constraints
 import rikka.shizuku.Shizuku
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /**
  * Zentrale Einstellungen von AtlayaSwitch: Zielprofil wählen. Erreichbar über
@@ -50,11 +61,26 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var updateCheckButton: Button
     private lateinit var updateDownloadButton: Button
     private lateinit var updateAutoSwitch: Switch
+    private lateinit var updateBackgroundSwitch: Switch
+    private lateinit var supportContactButton: Button
     private lateinit var backButton: Button
 
     private var profileAdapter: ProfileAdapter? = null
     private var latestUpdateUrl: String? = null
     private var lastShizukuStateRefreshMs = 0L
+
+    /** Ergebnis der Laufzeit-Abfrage von POST_NOTIFICATIONS (nur Android 13+/API 33) beim
+     * Aktivieren des Hintergrund-Update-Checks - siehe updateBackgroundSwitch weiter unten. */
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                schedulePeriodicUpdateCheck()
+            } else {
+                Toast.makeText(this, "Ohne Benachrichtigungs-Berechtigung kein Hintergrund-Update-Hinweis möglich.", Toast.LENGTH_LONG).show()
+                updateBackgroundSwitch.isChecked = false
+                prefs.edit().putBoolean(KEY_BACKGROUND_UPDATE_CHECK, false).apply()
+            }
+        }
 
     private val permissionListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == ShizukuUtils.REQUEST_CODE_PERMISSION) {
@@ -123,6 +149,27 @@ class SettingsActivity : AppCompatActivity() {
         updateAutoSwitch.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean(KEY_AUTO_UPDATE_CHECK, checked).apply()
         }
+
+        updateBackgroundSwitch = findViewById(R.id.update_background_switch)
+        updateBackgroundSwitch.isChecked = prefs.getBoolean(KEY_BACKGROUND_UPDATE_CHECK, false)
+        updateBackgroundSwitch.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean(KEY_BACKGROUND_UPDATE_CHECK, checked).apply()
+            if (checked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    schedulePeriodicUpdateCheck()
+                }
+            } else {
+                cancelPeriodicUpdateCheck()
+            }
+        }
+
+        supportContactButton = findViewById(R.id.support_contact_button)
+        supportContactButton.setOnClickListener { openSupportMail() }
 
         backButton = findViewById(R.id.settings_back_button)
         backButton.setOnClickListener { finish() }
@@ -403,8 +450,28 @@ class SettingsActivity : AppCompatActivity() {
         override fun getItemCount(): Int = profiles.size
     }
 
+    /** Registriert den periodischen Hintergrund-Check bei WorkManager - Mindestintervall
+     * von Android ist 15 Minuten, taeglich reicht fuer einen Update-Hinweis voellig aus und
+     * schont den Akku. Ueberlebt App-Neustarts UND Geraete-Neustarts automatisch (WorkManager
+     * persistiert eingeplante Arbeit selbst), es ist also keine BOOT_COMPLETED-Behandlung nötig. */
+    private fun schedulePeriodicUpdateCheck() {
+        val request = PeriodicWorkRequestBuilder<UpdateCheckWorker>(1, TimeUnit.DAYS)
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .build()
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            UpdateCheckWorker.UNIQUE_WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+    }
+
+    private fun cancelPeriodicUpdateCheck() {
+        WorkManager.getInstance(applicationContext).cancelUniqueWork(UpdateCheckWorker.UNIQUE_WORK_NAME)
+    }
+
     companion object {
         const val KEY_AUTO_UPDATE_CHECK = "auto_update_check"
+        const val KEY_BACKGROUND_UPDATE_CHECK = "background_update_check"
         const val KEY_SWITCH_MODE = "switch_mode"
         const val SWITCH_MODE_SWITCH_ONLY = "switch_only"
         const val SWITCH_MODE_END_SESSION = "end_session"
@@ -416,5 +483,24 @@ class SettingsActivity : AppCompatActivity() {
     private fun licenseUrl(): String {
         val tag = currentLanguageTag().takeIf { it in LICENSE_SITE_LANGUAGES } ?: "de"
         return "https://atlaya.capecter.com/atlayaswitch/$tag/lizenz.html"
+    }
+
+    /** Versionsnummer wird vorausgefuellt (analog zu installedVersionText oben) - erspart
+     * Chris die Rueckfrage "welche Version?" bei jeder Support-Mail. */
+    private fun openSupportMail() {
+        val versionName = packageManager.getPackageInfo(packageName, 0).versionName ?: "?"
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:AtlayaSwitch@capecter.com")
+            putExtra(Intent.EXTRA_SUBJECT, "[AtlayaSwitch] Support")
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "(Bitte hier beschreiben, was nicht funktioniert oder gewünscht ist.)\n\n---\nAtlayaSwitch $versionName"
+            )
+        }
+        try {
+            startActivity(intent)
+        } catch (e: android.content.ActivityNotFoundException) {
+            Toast.makeText(this, "Keine E-Mail-App gefunden.", Toast.LENGTH_LONG).show()
+        }
     }
 }
