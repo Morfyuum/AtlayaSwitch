@@ -1,11 +1,13 @@
 package com.capecter.atlayaswitch
 
 import android.Manifest
+import android.content.ComponentName
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.service.quicksettings.TileService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,6 +52,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var targetProfileWarningText: TextView
     private lateinit var targetProfileWarningButton: Button
     private lateinit var switchModeGroup: RadioGroup
+    private lateinit var quickTileSwitch: Switch
     private lateinit var languageButton: Button
     private lateinit var helpButton: Button
     private lateinit var shizukuBanner: View
@@ -122,6 +125,13 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit()
                 .putString(KEY_SWITCH_MODE, if (endSession) SWITCH_MODE_END_SESSION else SWITCH_MODE_SWITCH_ONLY)
                 .apply()
+        }
+
+        quickTileSwitch = findViewById(R.id.quick_tile_switch)
+        quickTileSwitch.isChecked = prefs.getBoolean(KEY_QUICK_TILE_ENABLED, false)
+        quickTileSwitch.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean(KEY_QUICK_TILE_ENABLED, checked).apply()
+            TileService.requestListeningState(this, ComponentName(this, QuickSwitchTileService::class.java))
         }
 
         shizukuBanner = findViewById(R.id.shizuku_banner)
@@ -473,6 +483,7 @@ class SettingsActivity : AppCompatActivity() {
         const val KEY_AUTO_UPDATE_CHECK = "auto_update_check"
         const val KEY_BACKGROUND_UPDATE_CHECK = "background_update_check"
         const val KEY_SWITCH_MODE = "switch_mode"
+        const val KEY_QUICK_TILE_ENABLED = "quick_tile_enabled"
         const val SWITCH_MODE_SWITCH_ONLY = "switch_only"
         const val SWITCH_MODE_END_SESSION = "end_session"
         private val LICENSE_SITE_LANGUAGES = setOf("de", "en", "fr", "it", "es")

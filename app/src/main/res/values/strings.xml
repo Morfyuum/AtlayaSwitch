@@ -40,6 +40,10 @@
     <string name="settings_shizuku_open_button">Shizuku öffnen</string>
     <string name="settings_shizuku_wrong_profile">Shizuku läuft nicht und kann von hier aus nicht gestartet werden: Entwickleroptionen/Drahtloses Debugging sind nur im Profil \"Eigentümer\" sichtbar. Dort öffnen und einmalig \"Start über Drahtloses Debugging\" antippen – läuft danach systemweit auch hier weiter.</string>
     <string name="settings_back_button">Zurück</string>
+    <string name="settings_section_quick_tile">Schnelleinstellungen-Kachel</string>
+    <string name="settings_quick_tile_hint">Ersetzt den frühere NFC-Trigger: Ein Tipp auf eine Kachel im Schnelleinstellungen-Panel löst denselben Wechsel wie der App-Icon-Tap aus – auch vom Sperrbildschirm aus, ohne die App zu öffnen. Anders als der App-Icon-Tap ist die Kachel dabei im heruntergezogenen Panel sichtbar (Symbol/Name bewusst neutral gehalten). Kachel danach selbst im Panel über das Stift-Symbol hinzufügen.</string>
+    <string name="settings_quick_tile_toggle_label">Kachel aktivieren</string>
+    <string name="qs_tile_label">Profil</string>
     <string name="settings_section_updates">Updates</string>
     <string name="settings_installed_version">Installierte Version: v%1$s</string>
     <string name="settings_update_status_checking">Prüfe…</string>

@@ -25,6 +25,10 @@
     <string name="settings_shizuku_open_button">Apri Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku non è in esecuzione e non può essere avviato da qui: le opzioni sviluppatore/debug wireless sono visibili solo nel profilo \"Proprietario\". Aprilo lì e tocca una volta \"Avvio tramite debug wireless\" – continuerà poi a funzionare a livello di sistema anche qui.</string>
     <string name="settings_back_button">Indietro</string>
+    <string name="settings_section_quick_tile">Riquadro Impostazioni rapide</string>
+    <string name="settings_quick_tile_hint">Sostituisce il precedente trigger NFC: toccare un riquadro nel pannello delle impostazioni rapide avvia lo stesso cambio del tocco sull\'icona dell\'app – anche dalla schermata di blocco, senza aprire l\'app. A differenza del tocco sull\'icona, il riquadro è visibile nel pannello aperto (icona/nome volutamente neutri). Aggiungi poi tu stesso il riquadro nel pannello tramite l\'icona a matita/modifica.</string>
+    <string name="settings_quick_tile_toggle_label">Attiva riquadro</string>
+    <string name="qs_tile_label">Profilo</string>
     <string name="settings_section_updates">Aggiornamenti</string>
     <string name="settings_installed_version">Versione installata: v%1$s</string>
     <string name="settings_update_status_checking">Verifica…</string>

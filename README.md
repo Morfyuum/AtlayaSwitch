@@ -18,6 +18,7 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 ## How it works
 
 - **MainActivity** immediately performs the switch to the saved target profile on launch (no visible UI) and then closes itself.
+- **QuickSwitchTileService** (optional, off by default, since v1.9.0) offers the same switch as a Quick Settings tile — reachable from the lock screen without opening the app. See "Quick Settings tile" below.
 - **SettingsActivity** lists all existing GrapheneOS profiles and saves the selection as the target user ID. Reachable via System Settings -> Apps -> AtlayaSwitch -> App info (a "Settings" link appears there automatically, see section below) instead of a menu of its own.
 - Since `Shizuku.newProcess()` is no longer publicly accessible in current Shizuku versions, the actual execution of `pm list users` / `am switch-user <id>` runs in a `UserService` process started via `Shizuku.bindUserService` with shell privileges (UID 2000). The app itself stays unprivileged, without `sharedUserId` and without root.
 
@@ -40,6 +41,16 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 
 4. **From then on: app icon = one-tap switch**
    - Tapping the AtlayaSwitch icon now switches straight to the saved target profile with no further prompt.
+
+## Quick Settings tile (optional, since v1.9.0)
+
+A second, optional trigger alongside the app icon tap: a tile in the Quick Settings panel that performs the same switch — reachable straight from the lock screen, without unlocking or opening the app.
+
+An earlier NFC-ring trigger was built and removed again in v1.8.2 (too many real-world issues: it never worked on a locked screen, a stale NFC dispatch cache after profile switches, per-profile tag-app permission grants). A true system-wide "tap anywhere" replacement was considered and rejected too: an overlay can't receive touches on the secured lock screen (same limitation NFC hit), and an accessibility service would need to enable touch-exploration mode, turning the whole device into a screen-reader-style UI — not an acceptable trade-off. The Quick Settings tile is the one mechanism that reaches the lock screen without either problem.
+
+Because a tile is, unlike the icon tap, visible in the pulled-down panel, it's **off by default** and deliberately unassuming: generic label ("Profile"), plain neutral icon, no toast on tap.
+
+To use it: enable "Enable tile" in Settings, then add the tile to the panel yourself via the pencil/edit icon in Quick Settings.
 
 ## Security consideration: lock screen on the decoy profile
 

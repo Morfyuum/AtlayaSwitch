@@ -32,24 +32,8 @@ class MainActivity : AppCompatActivity() {
         startSwitchFlow()
     }
 
-    /**
-     * Sperre gegen doppelte/schnelle Ausloesung (Doppel-Tap, hängengebliebener
-     * Stray-Intent, o.ä.): Ohne das koennen mehrere ueberlappende Shizuku-Anfragen
-     * denselben Verstopfungs-Effekt erzeugen, der frueher zu verspaeteten,
-     * ueberraschenden Wechseln gefuehrt hat (siehe [[pixel-grapheneos... Verlauf]]).
-     * Bewusst SharedPreferences statt eines In-Memory-Flags, damit die Sperre auch
-     * ueber einen Prozess-Neustart hinweg greift, nicht nur innerhalb derselben
-     * App-Instanz.
-     */
-    private fun tooSoonSinceLastAttempt(): Boolean {
-        val now = System.currentTimeMillis()
-        val last = prefs.getLong(KEY_LAST_SWITCH_ATTEMPT_MS, 0L)
-        prefs.edit().putLong(KEY_LAST_SWITCH_ATTEMPT_MS, now).apply()
-        return now - last < MIN_SWITCH_INTERVAL_MS
-    }
-
     private fun startSwitchFlow() {
-        if (tooSoonSinceLastAttempt()) {
+        if (SwitchDebounce.tooSoonSinceLastAttempt(prefs)) {
             finish()
             return
         }
@@ -83,27 +67,17 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        if (prefs.getString(SettingsActivity.KEY_SWITCH_MODE, SettingsActivity.SWITCH_MODE_END_SESSION)
-            == SettingsActivity.SWITCH_MODE_END_SESSION
-        ) {
-            // Erfolg des Beendens wird bewusst nicht per Toast angezeigt (auch nicht bei
-            // Fehlschlag, z.B. Profil "Eigentümer" laesst sich als Systemnutzer nicht
-            // stoppen) - der Trigger soll unauffaellig bleiben, siehe Klassenkommentar.
-            ShizukuUtils.switchToUserAndEndSession(
-                context = this,
-                targetUserId = targetUserId,
-                sourceUserId = ShizukuUtils.currentProfileUserId(),
-                onDone = { finish() },
-                onError = onError
-            )
-        } else {
-            ShizukuUtils.switchToUser(
-                context = this,
-                userId = targetUserId,
-                onDone = { finish() },
-                onError = onError
-            )
-        }
+        // Erfolg des Beendens (End-Session-Modus) wird bewusst nicht per Toast angezeigt
+        // (auch nicht bei Fehlschlag, z.B. Profil "Eigentümer" laesst sich als
+        // Systemnutzer nicht stoppen) - der Trigger soll unauffaellig bleiben, siehe
+        // Klassenkommentar.
+        ShizukuUtils.performConfiguredSwitch(
+            context = this,
+            prefs = prefs,
+            targetUserId = targetUserId,
+            onDone = { finish() },
+            onError = onError
+        )
     }
 
     private fun toastAndFinish(msg: String) {
@@ -118,7 +92,5 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_TARGET_USER_ID = "target_user_id"
-        private const val KEY_LAST_SWITCH_ATTEMPT_MS = "last_switch_attempt_ms"
-        private const val MIN_SWITCH_INTERVAL_MS = 3000L
     }
 }

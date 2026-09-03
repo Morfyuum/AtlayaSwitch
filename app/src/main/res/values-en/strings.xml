@@ -25,6 +25,10 @@
     <string name="settings_shizuku_open_button">Open Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku isn\'t running and can\'t be started from here: Developer options/Wireless debugging are only visible in the \"Owner\" profile. Open it there and tap \"Start via Wireless debugging\" once – it will then keep running system-wide, including here.</string>
     <string name="settings_back_button">Back</string>
+    <string name="settings_section_quick_tile">Quick Settings tile</string>
+    <string name="settings_quick_tile_hint">Replaces the earlier NFC trigger: tapping a tile in the Quick Settings panel triggers the same switch as the app icon tap – even from the lock screen, without opening the app. Unlike the app icon tap, the tile is visible in the pulled-down panel (icon/name kept deliberately neutral). Add the tile in the panel yourself via the pencil/edit icon afterwards.</string>
+    <string name="settings_quick_tile_toggle_label">Enable tile</string>
+    <string name="qs_tile_label">Profile</string>
     <string name="settings_section_updates">Updates</string>
     <string name="settings_installed_version">Installed version: v%1$s</string>
     <string name="settings_update_status_checking">Checking…</string>

@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Handler
@@ -179,6 +180,33 @@ object ShizukuUtils {
         withUserService(context, onError) { service ->
             val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
             postMain { onDone(ok) }
+        }
+    }
+
+    /**
+     * Fuehrt den Wechsel gemaess des gespeicherten Wechselmodus aus (End-Session vs. nur
+     * wechseln) - gemeinsame Verzweigung fuer alle Ausloeser (Icon-Tap, Schnelleinstellungen-
+     * Kachel), damit beide garantiert dasselbe Verhalten zeigen.
+     */
+    fun performConfiguredSwitch(
+        context: Context,
+        prefs: SharedPreferences,
+        targetUserId: Int,
+        onDone: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        if (prefs.getString(SettingsActivity.KEY_SWITCH_MODE, SettingsActivity.SWITCH_MODE_END_SESSION)
+            == SettingsActivity.SWITCH_MODE_END_SESSION
+        ) {
+            switchToUserAndEndSession(
+                context = context,
+                targetUserId = targetUserId,
+                sourceUserId = currentProfileUserId(),
+                onDone = { onDone() },
+                onError = onError
+            )
+        } else {
+            switchToUser(context = context, userId = targetUserId, onDone = onDone, onError = onError)
         }
     }
 

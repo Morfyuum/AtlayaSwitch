@@ -19,8 +19,8 @@ android {
         applicationId = "com.capecter.atlayaswitch"
         minSdk = 28
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.8.3"
+        versionCode = 13
+        versionName = "1.9.0"
     }
 
     signingConfigs {

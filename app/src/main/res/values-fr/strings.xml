@@ -25,6 +25,10 @@
     <string name="settings_shizuku_open_button">Ouvrir Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku ne fonctionne pas et ne peut pas être démarré depuis ici : les options développeur/débogage sans fil ne sont visibles que dans le profil \"Propriétaire\". Ouvrez-le là-bas et appuyez une fois sur \"Démarrage via débogage sans fil\" – il continuera ensuite à fonctionner sur tout le système, y compris ici.</string>
     <string name="settings_back_button">Retour</string>
+    <string name="settings_section_quick_tile">Tuile Réglages rapides</string>
+    <string name="settings_quick_tile_hint">Remplace l\'ancien déclencheur NFC : appuyer sur une tuile dans le panneau des réglages rapides déclenche le même changement que le tap sur l\'icône de l\'app – même depuis l\'écran de verrouillage, sans ouvrir l\'app. Contrairement au tap sur l\'icône, la tuile est visible dans le panneau déroulé (icône/nom volontairement neutres). Ajoutez ensuite la tuile vous-même dans le panneau via l\'icône crayon/modifier.</string>
+    <string name="settings_quick_tile_toggle_label">Activer la tuile</string>
+    <string name="qs_tile_label">Profil</string>
     <string name="settings_section_updates">Mises à jour</string>
     <string name="settings_installed_version">Version installée : v%1$s</string>
     <string name="settings_update_status_checking">Vérification…</string>
