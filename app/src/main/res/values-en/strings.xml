@@ -5,6 +5,7 @@
     <string name="settings_language_button_cd">Choose language</string>
     <string name="settings_help_button_cd">Help</string>
     <string name="settings_help_title">Why 3 profiles?</string>
+    <string name="settings_help_copyright_prefix">© 2026 Chris Deliga · atlaya.capecter.com · </string>
     <string name="settings_help_license_link">License</string>
     <string name="settings_help_body">AtlayaSwitch works best with three separate GrapheneOS profiles:\n\n• Owner – the system profile (User 0). Device management, developer options and Shizuku run here; only visible in this profile.\n\n• Private – your everyday profile for daily work, with all the apps and accounts you normally need.\n\n• Away – a deliberately empty decoy profile containing only unremarkable, harmless apps (e.g. camera, maps, an empty browser). It acts as a distraction: anyone taking a quick look at the device (a check, theft, coercion) only sees the mundane, with nothing pointing to further profiles or sensitive data.\n\nThis separation is the core of the duress concept: in an emergency, AtlayaSwitch immediately and quietly switches from the active profile to the harmless \"Away\" profile – no password prompt, no visible menu.</string>
     <string name="settings_section_profile">Target profile</string>

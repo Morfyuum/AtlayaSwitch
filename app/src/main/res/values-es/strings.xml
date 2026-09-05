@@ -5,6 +5,7 @@
     <string name="settings_language_button_cd">Elegir idioma</string>
     <string name="settings_help_button_cd">Ayuda</string>
     <string name="settings_help_title">¿Por qué 3 perfiles?</string>
+    <string name="settings_help_copyright_prefix">© 2026 Chris Deliga · atlaya.capecter.com · </string>
     <string name="settings_help_license_link">Licencia</string>
     <string name="settings_help_body">AtlayaSwitch funciona mejor con tres perfiles de GrapheneOS separados:\n\n• Propietario – el perfil del sistema (usuario 0). Aquí se ejecutan la gestión del dispositivo, las opciones de desarrollador y Shizuku; solo visible en este perfil.\n\n• Privado – tu perfil diario para el trabajo cotidiano, con todas las apps y cuentas que normalmente necesitas.\n\n• De viaje – un perfil señuelo deliberadamente vacío, con solo apps discretas e inofensivas (por ejemplo, cámara, mapas, un navegador vacío). Sirve de distracción: quien eche un vistazo rápido al dispositivo (un control, un robo, una coacción) solo verá cosas intrascendentes, sin ningún indicio de otros perfiles o datos sensibles.\n\nEsta separación es el núcleo del concepto de perfil bajo coacción: en caso de emergencia, AtlayaSwitch cambia de inmediato y de forma discreta del perfil activo al perfil inofensivo \"De viaje\" – sin solicitud de contraseña, sin menú visible.</string>
     <string name="settings_section_profile">Perfil de destino</string>
