@@ -1,6 +1,7 @@
 package com.capecter.atlayaswitch
 
 import android.content.Context
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import org.json.JSONObject
@@ -18,6 +19,7 @@ import java.net.URL
 object UpdateChecker {
 
     private const val FEED_URL = "https://atlaya.capecter.com/atlayaswitch/updates/latest.json"
+    private const val TRUSTED_DOWNLOAD_HOST = "atlaya.capecter.com"
     private val mainHandler = Handler(Looper.getMainLooper())
 
     data class UpdateResult(
@@ -45,7 +47,7 @@ object UpdateChecker {
 
                 val json = JSONObject(body)
                 val latestVersion = json.optString("version", currentVersion)
-                val downloadUrl = json.optString("url", "")
+                val downloadUrl = json.optString("url", "").takeIf { isTrustedDownloadUrl(it) } ?: ""
                 val result = UpdateResult(
                     currentVersion = currentVersion,
                     latestVersion = latestVersion,
@@ -57,6 +59,21 @@ object UpdateChecker {
                 mainHandler.post { onError(e) }
             }
         }.start()
+    }
+
+    /**
+     * Der Download-Link kommt aus fremdem JSON und wird per ACTION_VIEW geöffnet. Ohne Prüfung
+     * könnte ein manipulierter Feed jedes beliebige URI-Schema (tel:, market:, intent:, eine
+     * App-Deep-Link ...) unterschieben. Deshalb nur https auf der eigenen Domain; alles andere
+     * wird wie "kein Link vorhanden" behandelt (Download-Button bleibt dann ausgeblendet).
+     */
+    private fun isTrustedDownloadUrl(url: String): Boolean {
+        val uri = try {
+            Uri.parse(url)
+        } catch (e: Exception) {
+            return false
+        }
+        return uri.scheme == "https" && uri.host == TRUSTED_DOWNLOAD_HOST
     }
 
     private fun isNewer(latest: String, current: String): Boolean {

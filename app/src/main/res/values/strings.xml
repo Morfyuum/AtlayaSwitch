@@ -36,10 +36,18 @@
     <string name="settings_shizuku_not_installed_other">Shizuku ist nicht installiert. Entwickleroptionen und Drahtloses Debugging sind nur im Profil \"Eigentümer\" sichtbar – dort zuerst installieren und einrichten, danach hier automatisch erkannt.</string>
     <string name="settings_shizuku_install_button">Shizuku installieren (Play Store)</string>
     <string name="settings_shizuku_switch_profile_button">Profil wechseln</string>
-    <string name="settings_shizuku_not_running">Shizuku ist installiert, läuft aber nicht (z. B. nach einem Geräte-Neustart) – für den Profilwechsel erforderlich. Bitte hier öffnen und einmalig \"Start über Drahtloses Debugging\" antippen.</string>
+    <string name="settings_shizuku_not_running">Shizuku ist installiert, läuft aber nicht (z. B. nach einem Geräte-Neustart) – für den Profilwechsel erforderlich. Ohne PC: in den Entwickleroptionen USB-Debugging (bleibt an) und Drahtloses Debugging einschalten, dann in Shizuku \"Start über Drahtloses Debugging\" antippen. AtlayaSwitch schaltet Drahtloses Debugging danach selbst wieder aus.</string>
     <string name="settings_shizuku_open_button">Shizuku öffnen</string>
     <string name="settings_shizuku_wrong_profile">Shizuku läuft nicht und kann von hier aus nicht gestartet werden: Entwickleroptionen/Drahtloses Debugging sind nur im Profil \"Eigentümer\" sichtbar. Dort öffnen und einmalig \"Start über Drahtloses Debugging\" antippen – läuft danach systemweit auch hier weiter.</string>
     <string name="settings_back_button">Zurück</string>
+    <string name="settings_section_adb">Drahtloses Debugging</string>
+    <string name="settings_adb_hint">Drahtloses Debugging wird nur gebraucht, um Shizuku nach einem Neustart zu starten (ganz ohne PC). Läuft Shizuku, kann es aus bleiben – das schließt einen offenen Netzwerk-Zugang. AtlayaSwitch schaltet es dann selbst aus. Voraussetzung: USB-Debugging bleibt an (geht ohne Kabel und PC), sonst beendet Android den Debugging-Dienst und damit Shizuku.</string>
+    <string name="settings_adb_auto_label">Nach dem Shizuku-Start automatisch ausschalten (empfohlen)</string>
+    <string name="settings_adb_status_already_off">Drahtloses Debugging ist aus.</string>
+    <string name="settings_adb_status_turned_off">Drahtloses Debugging wurde ausgeschaltet. Shizuku läuft weiter.</string>
+    <string name="settings_adb_status_usb_off">Drahtloses Debugging ist noch an und wurde NICHT ausgeschaltet: USB-Debugging ist aus – Android würde sonst den Debugging-Dienst und damit Shizuku beenden. Schalte im Profil \"Eigentümer\" zuerst USB-Debugging ein (kein Kabel und kein PC nötig) und öffne diese Seite danach erneut.</string>
+    <string name="settings_adb_status_failed">Drahtloses Debugging ließ sich nicht ausschalten – bitte von Hand in den Entwickleroptionen ausschalten.</string>
+    <string name="settings_adb_open_dev_button">Entwickleroptionen öffnen</string>
     <string name="settings_section_quick_tile">Schnelleinstellungen-Kachel</string>
     <string name="settings_quick_tile_hint">Ersetzt den frühere NFC-Trigger: Ein Tipp auf eine Kachel im Schnelleinstellungen-Panel löst denselben Wechsel wie der App-Icon-Tap aus – auch vom Sperrbildschirm aus, ohne die App zu öffnen. Anders als der App-Icon-Tap ist die Kachel dabei im heruntergezogenen Panel sichtbar (Symbol/Name bewusst neutral gehalten). Kachel danach selbst im Panel über das Stift-Symbol hinzufügen.</string>
     <string name="settings_quick_tile_toggle_label">Kachel aktivieren</string>
@@ -53,10 +61,6 @@
     <string name="settings_update_check_button">Jetzt prüfen</string>
     <string name="settings_update_download_button">Herunterladen</string>
     <string name="settings_update_auto_label">Beim Öffnen automatisch prüfen</string>
-    <string name="settings_update_background_label">Im Hintergrund regelmäßig prüfen (Benachrichtigung)</string>
-    <string name="update_notification_channel_name">Update verfügbar</string>
-    <string name="update_notification_title">AtlayaSwitch-Update verfügbar</string>
-    <string name="update_notification_text">Version %1$s ist verfügbar – antippen zum Herunterladen</string>
     <string name="settings_section_support">Support</string>
     <string name="settings_support_button">Support kontaktieren</string>
 </resources>

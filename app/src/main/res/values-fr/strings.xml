@@ -22,10 +22,18 @@
     <string name="settings_shizuku_not_installed_other">Shizuku n\'est pas installé. Les options développeur et le débogage sans fil ne sont visibles que dans le profil \"Propriétaire\" – installez et configurez-le d\'abord là-bas, il sera ensuite détecté automatiquement ici.</string>
     <string name="settings_shizuku_install_button">Installer Shizuku (Play Store)</string>
     <string name="settings_shizuku_switch_profile_button">Changer de profil</string>
-    <string name="settings_shizuku_not_running">Shizuku est installé mais ne fonctionne pas (par ex. après un redémarrage de l\'appareil) – nécessaire pour le changement de profil. Veuillez l\'ouvrir ici et appuyer une fois sur \"Démarrage via débogage sans fil\".</string>
+    <string name="settings_shizuku_not_running">Shizuku est installé mais ne fonctionne pas (par ex. après un redémarrage de l\'appareil) – nécessaire pour le changement de profil. Sans PC : dans les options développeur, activez le débogage USB (il reste activé) et le débogage sans fil, puis appuyez sur \"Démarrage via débogage sans fil\" dans Shizuku. AtlayaSwitch désactive ensuite lui-même le débogage sans fil.</string>
     <string name="settings_shizuku_open_button">Ouvrir Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku ne fonctionne pas et ne peut pas être démarré depuis ici : les options développeur/débogage sans fil ne sont visibles que dans le profil \"Propriétaire\". Ouvrez-le là-bas et appuyez une fois sur \"Démarrage via débogage sans fil\" – il continuera ensuite à fonctionner sur tout le système, y compris ici.</string>
     <string name="settings_back_button">Retour</string>
+    <string name="settings_section_adb">Débogage sans fil</string>
+    <string name="settings_adb_hint">Le débogage sans fil ne sert qu\'à démarrer Shizuku après un redémarrage (sans PC). Une fois Shizuku lancé, il peut rester désactivé – cela ferme un accès réseau ouvert. AtlayaSwitch le désactive alors lui-même. Condition : le débogage USB reste activé (possible sans câble ni PC), sinon Android arrête le service de débogage et Shizuku avec lui.</string>
+    <string name="settings_adb_auto_label">Désactiver automatiquement après le démarrage de Shizuku (recommandé)</string>
+    <string name="settings_adb_status_already_off">Le débogage sans fil est désactivé.</string>
+    <string name="settings_adb_status_turned_off">Le débogage sans fil a été désactivé. Shizuku continue de fonctionner.</string>
+    <string name="settings_adb_status_usb_off">Le débogage sans fil est toujours activé et n\'a PAS été désactivé : le débogage USB est désactivé – Android arrêterait sinon le service de débogage et Shizuku avec lui. Dans le profil \"Propriétaire\", activez d\'abord le débogage USB (ni câble ni PC nécessaire), puis rouvrez cette page.</string>
+    <string name="settings_adb_status_failed">Impossible de désactiver le débogage sans fil – veuillez le désactiver manuellement dans les options développeur.</string>
+    <string name="settings_adb_open_dev_button">Ouvrir les options développeur</string>
     <string name="settings_section_quick_tile">Tuile Réglages rapides</string>
     <string name="settings_quick_tile_hint">Remplace l\'ancien déclencheur NFC : appuyer sur une tuile dans le panneau des réglages rapides déclenche le même changement que le tap sur l\'icône de l\'app – même depuis l\'écran de verrouillage, sans ouvrir l\'app. Contrairement au tap sur l\'icône, la tuile est visible dans le panneau déroulé (icône/nom volontairement neutres). Ajoutez ensuite la tuile vous-même dans le panneau via l\'icône crayon/modifier.</string>
     <string name="settings_quick_tile_toggle_label">Activer la tuile</string>
@@ -39,10 +47,6 @@
     <string name="settings_update_check_button">Vérifier maintenant</string>
     <string name="settings_update_download_button">Télécharger</string>
     <string name="settings_update_auto_label">Vérifier automatiquement à l\'ouverture</string>
-    <string name="settings_update_background_label">Vérifier régulièrement en arrière-plan (notification)</string>
-    <string name="update_notification_channel_name">Mise à jour disponible</string>
-    <string name="update_notification_title">Mise à jour d\'AtlayaSwitch disponible</string>
-    <string name="update_notification_text">La version %1$s est disponible – appuyez pour télécharger</string>
     <string name="settings_section_support">Assistance</string>
     <string name="settings_support_button">Contacter l\'assistance</string>
 </resources>

@@ -22,10 +22,18 @@
     <string name="settings_shizuku_not_installed_other">Shizuku no está instalado. Las opciones de desarrollador y la depuración inalámbrica solo son visibles en el perfil \"Propietario\" – instálalo y configúralo allí primero, luego se detectará automáticamente aquí.</string>
     <string name="settings_shizuku_install_button">Instalar Shizuku (Play Store)</string>
     <string name="settings_shizuku_switch_profile_button">Cambiar de perfil</string>
-    <string name="settings_shizuku_not_running">Shizuku está instalado pero no en ejecución (p. ej. tras reiniciar el dispositivo) – necesario para el cambio de perfil. Ábrelo aquí y toca una vez \"Inicio mediante depuración inalámbrica\".</string>
+    <string name="settings_shizuku_not_running">Shizuku está instalado pero no en ejecución (p. ej. tras reiniciar el dispositivo) – necesario para el cambio de perfil. Sin PC: en las opciones de desarrollador activa la depuración USB (se queda activada) y la depuración inalámbrica, luego toca \"Inicio mediante depuración inalámbrica\" en Shizuku. Después AtlayaSwitch desactiva por sí mismo la depuración inalámbrica.</string>
     <string name="settings_shizuku_open_button">Abrir Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku no está en ejecución y no se puede iniciar desde aquí: las opciones de desarrollador/depuración inalámbrica solo son visibles en el perfil \"Propietario\". Ábrelo allí y toca una vez \"Inicio mediante depuración inalámbrica\" – luego seguirá funcionando en todo el sistema, también aquí.</string>
     <string name="settings_back_button">Atrás</string>
+    <string name="settings_section_adb">Depuración inalámbrica</string>
+    <string name="settings_adb_hint">La depuración inalámbrica solo se necesita para iniciar Shizuku tras un reinicio (sin PC). Con Shizuku en marcha puede seguir desactivada – así se cierra un acceso de red abierto. AtlayaSwitch la desactiva entonces por sí mismo. Requisito: la depuración USB sigue activada (funciona sin cable ni PC); de lo contrario Android detiene el servicio de depuración y con él a Shizuku.</string>
+    <string name="settings_adb_auto_label">Desactivar automáticamente tras iniciar Shizuku (recomendado)</string>
+    <string name="settings_adb_status_already_off">La depuración inalámbrica está desactivada.</string>
+    <string name="settings_adb_status_turned_off">La depuración inalámbrica se ha desactivado. Shizuku sigue funcionando.</string>
+    <string name="settings_adb_status_usb_off">La depuración inalámbrica sigue activada y NO se ha desactivado: la depuración USB está desactivada – de lo contrario Android detendría el servicio de depuración y con él a Shizuku. En el perfil \"Propietario\", activa primero la depuración USB (no hace falta cable ni PC) y vuelve a abrir esta página.</string>
+    <string name="settings_adb_status_failed">No se pudo desactivar la depuración inalámbrica – desactívala manualmente en las opciones de desarrollador.</string>
+    <string name="settings_adb_open_dev_button">Abrir opciones de desarrollador</string>
     <string name="settings_section_quick_tile">Mosaico de ajustes rápidos</string>
     <string name="settings_quick_tile_hint">Sustituye al antiguo disparador NFC: tocar un mosaico en el panel de ajustes rápidos activa el mismo cambio que tocar el icono de la app, incluso desde la pantalla de bloqueo, sin abrir la app. A diferencia del toque en el icono, el mosaico es visible en el panel desplegado (icono/nombre deliberadamente neutros). Añade después el mosaico tú mismo en el panel con el icono de lápiz/editar.</string>
     <string name="settings_quick_tile_toggle_label">Activar mosaico</string>
@@ -39,10 +47,6 @@
     <string name="settings_update_check_button">Comprobar ahora</string>
     <string name="settings_update_download_button">Descargar</string>
     <string name="settings_update_auto_label">Comprobar automáticamente al abrir</string>
-    <string name="settings_update_background_label">Comprobar periódicamente en segundo plano (notificación)</string>
-    <string name="update_notification_channel_name">Actualización disponible</string>
-    <string name="update_notification_title">Actualización de AtlayaSwitch disponible</string>
-    <string name="update_notification_text">La versión %1$s está disponible – toca para descargar</string>
     <string name="settings_section_support">Soporte</string>
     <string name="settings_support_button">Contactar con soporte</string>
 </resources>

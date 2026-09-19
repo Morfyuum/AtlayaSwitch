@@ -9,9 +9,9 @@ One tap on the app icon, and your phone shows only what it's supposed to show.
 AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switches instantly and without any visible menu to a predefined, deliberately unremarkable user profile — with a single tap on the app icon — for moments when a device might be briefly inspected or checked, without the action itself looking suspicious.
 
 **Benefits:**
-- No root required — uses only [Shizuku's](https://shizuku.rikka.app/) ADB shell privileges, GrapheneOS' security model stays fully intact
+- No root required — uses [Shizuku's](https://shizuku.rikka.app/) ADB shell privileges. **This is a real trade-off, not free:** it needs Developer options and USB debugging switched on, and Wireless debugging briefly after every reboot — see "Known trade-offs" below
 - No visible picker menu, no spoken codeword — switches in under a second
-- The way back stays the regular, password-protected GrapheneOS profile switch — no new attack surface
+- The way back stays the regular, password-protected GrapheneOS profile switch — AtlayaSwitch doesn't touch it
 - Automatically detects if it's accidentally installed in the decoy profile itself (which would give the trick away) and offers one-tap removal
 - Fully offline, no cloud, no trackers
 
@@ -27,9 +27,10 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 1. **Install & enable Shizuku**
    - Since v1.6, **SettingsActivity** walks you through this step itself (see "Guided Shizuku setup" below) — doing it manually works the same way:
    - Install Shizuku from the Play Store / F-Droid.
-   - **Important:** Developer options and "Wireless debugging" are only visible in the "Owner" profile on GrapheneOS (as on Android in general). Start Shizuku there first: enable developer options (Settings → About phone → tap the build number repeatedly if not visible yet), turn on "Wireless debugging", then tap "Start via Wireless debugging" in Shizuku (one-time pairing via pairing code, afterwards "Start" is enough). Runs entirely on the device itself, **no PC/ADB terminal needed** — the pairing code is entered directly on Shizuku's own screen. In secondary profiles ("Personal", "Away") Shizuku shows no start option there, that's not a bug.
-   - Alternatively, start it from a PC via ADB: `adb shell sh /sdcard/Android/data/moe.shizuku.privileged.api/start.sh` (or the command shown in the Shizuku app).
-   - After starting, the service keeps running system-wide with ADB shell privileges and is automatically recognized by AtlayaSwitch/Shizuku in the other profiles. **Without root this doesn't survive a device reboot** — Shizuku has to be started again in the "Owner" profile after every reboot, otherwise AtlayaSwitch won't react.
+   - **Important:** Developer options and "Wireless debugging" are only visible in the "Owner" profile on GrapheneOS (as on Android in general). Start Shizuku there first: enable developer options (Settings → About phone → tap the build number repeatedly if not visible yet), turn on **"USB debugging"** (no cable or PC needed — it just has to be on, see below) and "Wireless debugging", then tap "Start via Wireless debugging" in Shizuku (one-time pairing via pairing code, afterwards "Start" is enough). Runs entirely on the device itself, **no PC/ADB terminal needed** — the pairing code is entered directly on Shizuku's own screen. In secondary profiles ("Personal", "Away") Shizuku shows no start option there, that's not a bug.
+   - **Then Wireless debugging is no longer needed and can go off** — AtlayaSwitch switches it off by itself as soon as Shizuku is running (Settings → "Wireless debugging", on by default, can be disabled). **USB debugging has to stay on:** Android keeps its debugging service (`adbd`) alive only while USB *or* Wireless debugging is on, and Shizuku is ended together with `adbd` (measured on a Pixel 10 Pro / GrapheneOS: Shizuku survived Wireless debugging being switched off, but was gone after USB debugging was switched off as well). If USB debugging is off, AtlayaSwitch deliberately does not switch Wireless debugging off and tells you why.
+   - Alternatively, start it from a PC via USB ADB, without Wireless debugging at all: `adb shell <path>/libshizuku.so` — the exact command is shown in the Shizuku app under "View command". The Shizuku app's `start.sh` isn't always present, use the command shown there.
+   - After starting, the service keeps running system-wide with ADB shell privileges and is automatically recognized by AtlayaSwitch/Shizuku in the other profiles. **Without root this doesn't survive a device reboot** — Shizuku has to be started again in the "Owner" profile after every reboot (GrapheneOS' auto-reboot counts too), otherwise AtlayaSwitch can't do the switch itself. In that case, tapping the icon quietly opens Android's own user switcher instead (no error message, nothing revealing on screen) — you can still tap your way into the target profile.
 
 2. **Install AtlayaSwitch**
    - Download the current, signed **`app-release.apk`** from the [Releases page](../../releases/latest) and install it.
@@ -55,6 +56,15 @@ To use it: enable "Enable tile" in Settings, then add the tile to the panel your
 ## Security consideration: lock screen on the decoy profile
 
 For the switch to stay a genuine single tap with no further prompt, the decoy/duress profile should have **no PIN, password or fingerprint lock** set — any lock screen there would just present its own unlock prompt after the switch. Leaving it unlocked keeps the one-tap promise, but it's a trade-off: anyone who reaches that profile also has unrestricted access to whatever is in it, with no second gate at all. Whether that trade-off makes sense depends entirely on what you put in the decoy profile and your own threat model — it's your call, not something the app decides for you.
+
+## Known trade-offs (please read)
+
+- **ADB is part of the design.** Shizuku can only be started through Android's debugging service (`adbd`); without root there is no other way to get a process with shell rights. So Developer options and USB debugging stay on, and Wireless debugging is on briefly after each reboot. That is more attack surface than a phone without it, and it's the reason this app isn't for everyone — especially not for users who chose GrapheneOS to minimise exactly that.
+- **What limits the exposure:** Wireless debugging goes off again automatically (see Setup), so no debugging port is left open on the network after the start. `adbd` over USB additionally needs a cable, an unlocked device and an authorised key (GrapheneOS' USB-C port setting is a further gate). Only apps you explicitly grant in Shizuku can use its shell rights — check that AtlayaSwitch is the only one. The `UserService` that runs with shell rights only accepts the fixed commands it needs and only acts on AtlayaSwitch's own package.
+- **It's not a lock.** The target profile can be recognised as "not the main profile". It only helps if it's plausibly filled with everyday content (a few photos, some apps, a bit of history) — an empty profile looks suspicious and raises more questions than it answers.
+- **Shizuku dies with every reboot**, see Setup. Until you've started it again, the icon tap can't switch by itself (it opens Android's user switcher as a quiet fallback).
+- **Any app in the same profile can start the switch** (the launcher activity has to be exported). With "Switch + end session" this also ends the source profile. The worst case is landing in the unremarkable target profile — no security risk, but an annoyance.
+- **Network access:** the only thing AtlayaSwitch does online is the optional update check against `atlaya.capecter.com`; it only ever opens https links on that domain.
 
 ## Note on the way back
 
@@ -82,7 +92,7 @@ adb install --user 0  app-release.apk   # Owner
 adb install --user 10 app-release.apk   # Personal (check ID via "pm list users" if needed)
 ```
 
-Shizuku itself only needs to be started once via ADB (in the "Owner" profile, since only there is the wireless-debugging setting visible). The service then keeps running system-wide with shell privileges and is automatically recognized by the Shizuku app instances in other profiles as soon as a permission request (e.g. by AtlayaSwitch) runs there once.
+Shizuku itself has to be started once per device boot (in the "Owner" profile, since only there is the debugging setting visible). The service then keeps running system-wide with shell privileges and is automatically recognized by the Shizuku app instances in other profiles as soon as a permission request (e.g. by AtlayaSwitch) runs there once.
 
 ## Reaching settings via App info
 
@@ -107,11 +117,11 @@ If Shizuku isn't running, **SettingsActivity** shows a banner at the top instead
 
 **What still isn't possible this way** (Android's security model, can't be bypassed without root): switching to the "Owner" profile itself always needs a manual tap there in the multi-user overview (a third-party app can't trigger a profile switch on its own before Shizuku exists — Shizuku is exactly what provides those rights, a classic chicken-and-egg problem), and the app installation itself always needs the final confirmation in the system install dialog (Android enforces this for every app install without device-owner rights). Both reduce to a single tap instead of requiring insider knowledge, but can't be fully automated away.
 
-The pairing-code coupling itself has always run entirely on the device (Shizuku's own "Start via Wireless debugging" screen), **no PC/ADB terminal needed** — that was only a debugging method during development, not a step real users need.
+The pairing-code coupling itself has always run entirely on the device (Shizuku's own "Start via Wireless debugging" screen), **no PC/ADB terminal needed** — that was only a debugging method during development, not a step real users need. In the "installed but not running" state the banner therefore also offers an "Open Developer options" button (Owner profile only), so the after-reboot restart (USB debugging on, Wireless debugging on, "Start" in Shizuku) is a few taps without a PC.
 
 ## Update check
 
-In **SettingsActivity** under "Updates": the "Check now" button reads `https://atlaya.capecter.com/atlayaswitch/updates/latest.json` and compares the version listed there with the installed one. The "Check automatically on open" toggle (default: off) does this automatically when opening Settings. If an update is available, a "Download" button appears that opens the download page in the browser — AtlayaSwitch doesn't download or install anything itself.
+In **SettingsActivity** under "Updates": the "Check now" button reads `https://atlaya.capecter.com/atlayaswitch/updates/latest.json` and compares the version listed there with the installed one. The "Check automatically on open" toggle (default: off) does this automatically when opening Settings. If an update is available, a "Download" button appears that opens the download page in the browser — AtlayaSwitch doesn't download or install anything itself, and it only accepts https links on `atlaya.capecter.com`. There is no background check.
 
 ## Wireless ADB connection
 

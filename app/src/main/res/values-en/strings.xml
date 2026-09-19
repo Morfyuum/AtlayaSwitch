@@ -22,10 +22,18 @@
     <string name="settings_shizuku_not_installed_other">Shizuku is not installed. Developer options and Wireless debugging are only visible in the \"Owner\" profile – install and set it up there first, it will then be detected here automatically.</string>
     <string name="settings_shizuku_install_button">Install Shizuku (Play Store)</string>
     <string name="settings_shizuku_switch_profile_button">Switch profile</string>
-    <string name="settings_shizuku_not_running">Shizuku is installed but not running (e.g. after a device restart) – required for the profile switch. Please open it here and tap \"Start via Wireless debugging\" once.</string>
+    <string name="settings_shizuku_not_running">Shizuku is installed but not running (e.g. after a device restart) – required for the profile switch. Without a PC: in Developer options switch on USB debugging (it stays on) and Wireless debugging, then tap \"Start via Wireless debugging\" in Shizuku. AtlayaSwitch then switches Wireless debugging off again by itself.</string>
     <string name="settings_shizuku_open_button">Open Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku isn\'t running and can\'t be started from here: Developer options/Wireless debugging are only visible in the \"Owner\" profile. Open it there and tap \"Start via Wireless debugging\" once – it will then keep running system-wide, including here.</string>
     <string name="settings_back_button">Back</string>
+    <string name="settings_section_adb">Wireless debugging</string>
+    <string name="settings_adb_hint">Wireless debugging is only needed to start Shizuku after a restart (no PC required). Once Shizuku is running it can stay off – that closes an open network entry point. AtlayaSwitch then switches it off itself. Requirement: USB debugging stays on (works without a cable or PC), otherwise Android stops the debugging service and Shizuku with it.</string>
+    <string name="settings_adb_auto_label">Switch off automatically after Shizuku has started (recommended)</string>
+    <string name="settings_adb_status_already_off">Wireless debugging is off.</string>
+    <string name="settings_adb_status_turned_off">Wireless debugging was switched off. Shizuku keeps running.</string>
+    <string name="settings_adb_status_usb_off">Wireless debugging is still on and was NOT switched off: USB debugging is off – Android would otherwise stop the debugging service and Shizuku with it. In the \"Owner\" profile, switch on USB debugging first (no cable or PC needed), then reopen this page.</string>
+    <string name="settings_adb_status_failed">Wireless debugging could not be switched off – please switch it off manually in Developer options.</string>
+    <string name="settings_adb_open_dev_button">Open Developer options</string>
     <string name="settings_section_quick_tile">Quick Settings tile</string>
     <string name="settings_quick_tile_hint">Replaces the earlier NFC trigger: tapping a tile in the Quick Settings panel triggers the same switch as the app icon tap – even from the lock screen, without opening the app. Unlike the app icon tap, the tile is visible in the pulled-down panel (icon/name kept deliberately neutral). Add the tile in the panel yourself via the pencil/edit icon afterwards.</string>
     <string name="settings_quick_tile_toggle_label">Enable tile</string>
@@ -39,10 +47,6 @@
     <string name="settings_update_check_button">Check now</string>
     <string name="settings_update_download_button">Download</string>
     <string name="settings_update_auto_label">Check automatically on open</string>
-    <string name="settings_update_background_label">Check regularly in the background (notification)</string>
-    <string name="update_notification_channel_name">Update available</string>
-    <string name="update_notification_title">AtlayaSwitch update available</string>
-    <string name="update_notification_text">Version %1$s is available – tap to download</string>
     <string name="settings_section_support">Support</string>
     <string name="settings_support_button">Contact Support</string>
 </resources>

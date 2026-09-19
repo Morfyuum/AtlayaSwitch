@@ -22,10 +22,18 @@
     <string name="settings_shizuku_not_installed_other">Shizuku non è installato. Le opzioni sviluppatore e il debug wireless sono visibili solo nel profilo \"Proprietario\" – installalo e configuralo prima lì, verrà poi rilevato automaticamente qui.</string>
     <string name="settings_shizuku_install_button">Installa Shizuku (Play Store)</string>
     <string name="settings_shizuku_switch_profile_button">Cambia profilo</string>
-    <string name="settings_shizuku_not_running">Shizuku è installato ma non è in esecuzione (ad es. dopo un riavvio del dispositivo) – necessario per il cambio di profilo. Aprilo qui e tocca una volta \"Avvio tramite debug wireless\".</string>
+    <string name="settings_shizuku_not_running">Shizuku è installato ma non è in esecuzione (ad es. dopo un riavvio del dispositivo) – necessario per il cambio di profilo. Senza PC: nelle opzioni sviluppatore attiva il debug USB (resta attivo) e il debug wireless, poi tocca \"Avvio tramite debug wireless\" in Shizuku. AtlayaSwitch disattiva poi da solo il debug wireless.</string>
     <string name="settings_shizuku_open_button">Apri Shizuku</string>
     <string name="settings_shizuku_wrong_profile">Shizuku non è in esecuzione e non può essere avviato da qui: le opzioni sviluppatore/debug wireless sono visibili solo nel profilo \"Proprietario\". Aprilo lì e tocca una volta \"Avvio tramite debug wireless\" – continuerà poi a funzionare a livello di sistema anche qui.</string>
     <string name="settings_back_button">Indietro</string>
+    <string name="settings_section_adb">Debug wireless</string>
+    <string name="settings_adb_hint">Il debug wireless serve solo ad avviare Shizuku dopo un riavvio (senza PC). Una volta avviato Shizuku può restare disattivato – così si chiude un accesso di rete aperto. AtlayaSwitch lo disattiva poi da solo. Condizione: il debug USB resta attivo (funziona senza cavo e senza PC), altrimenti Android arresta il servizio di debug e con esso Shizuku.</string>
+    <string name="settings_adb_auto_label">Disattiva automaticamente dopo l\'avvio di Shizuku (consigliato)</string>
+    <string name="settings_adb_status_already_off">Il debug wireless è disattivato.</string>
+    <string name="settings_adb_status_turned_off">Il debug wireless è stato disattivato. Shizuku continua a funzionare.</string>
+    <string name="settings_adb_status_usb_off">Il debug wireless è ancora attivo e NON è stato disattivato: il debug USB è disattivato – altrimenti Android arresterebbe il servizio di debug e con esso Shizuku. Nel profilo \"Proprietario\" attiva prima il debug USB (non servono cavo né PC), poi riapri questa pagina.</string>
+    <string name="settings_adb_status_failed">Impossibile disattivare il debug wireless – disattivalo manualmente nelle opzioni sviluppatore.</string>
+    <string name="settings_adb_open_dev_button">Apri opzioni sviluppatore</string>
     <string name="settings_section_quick_tile">Riquadro Impostazioni rapide</string>
     <string name="settings_quick_tile_hint">Sostituisce il precedente trigger NFC: toccare un riquadro nel pannello delle impostazioni rapide avvia lo stesso cambio del tocco sull\'icona dell\'app – anche dalla schermata di blocco, senza aprire l\'app. A differenza del tocco sull\'icona, il riquadro è visibile nel pannello aperto (icona/nome volutamente neutri). Aggiungi poi tu stesso il riquadro nel pannello tramite l\'icona a matita/modifica.</string>
     <string name="settings_quick_tile_toggle_label">Attiva riquadro</string>
@@ -39,10 +47,6 @@
     <string name="settings_update_check_button">Verifica ora</string>
     <string name="settings_update_download_button">Scarica</string>
     <string name="settings_update_auto_label">Verifica automaticamente all\'apertura</string>
-    <string name="settings_update_background_label">Verifica periodicamente in background (notifica)</string>
-    <string name="update_notification_channel_name">Aggiornamento disponibile</string>
-    <string name="update_notification_title">Aggiornamento di AtlayaSwitch disponibile</string>
-    <string name="update_notification_text">La versione %1$s è disponibile – tocca per scaricare</string>
     <string name="settings_section_support">Supporto</string>
     <string name="settings_support_button">Contatta il supporto</string>
 </resources>

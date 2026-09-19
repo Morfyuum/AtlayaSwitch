@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.SharedPreferences
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.provider.Settings
 import rikka.shizuku.Shizuku
 
 /**
@@ -26,6 +28,32 @@ object ShizukuUtils {
     const val REQUEST_CODE_PERMISSION = 1001
 
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    /**
+     * Log-Ausgaben nur in Debug-Builds: im Release würde logcat sonst bei jedem Wechsel
+     * protokollieren, dass AtlayaSwitch gerade einen Profilwechsel über Shizuku anstößt - für
+     * eine Tarn-App unnötige Spur. Wird beim ersten withUserService-Aufruf gesetzt.
+     */
+    @Volatile
+    private var debugLogging = false
+
+    private fun logInfo(msg: String) {
+        if (debugLogging) android.util.Log.i(LOG_TAG, msg)
+    }
+
+    private fun logWarn(msg: String) {
+        if (debugLogging) android.util.Log.w(LOG_TAG, msg)
+    }
+
+    private fun logError(msg: String, e: Throwable) {
+        if (debugLogging) android.util.Log.e(LOG_TAG, msg, e)
+    }
+
+    private const val LOG_TAG = "AtlayaSwitchClient"
+
+    /** Preferences-Schlüssel: Drahtloses Debugging nach dem Shizuku-Start automatisch ausschalten
+     * (Standard: an - siehe SettingsActivity und AdbHardening). */
+    const val KEY_AUTO_DISABLE_WIRELESS_DEBUGGING = "auto_disable_wireless_debugging"
 
     data class GraphenProfile(val userId: Int, val label: String)
 
@@ -111,6 +139,19 @@ object ShizukuUtils {
         }
     }
 
+    /**
+     * Öffnet die Entwickleroptionen (öffentlicher Intent, keine Berechtigung nötig) - dort werden
+     * USB-Debugging und Drahtloses Debugging geschaltet, um Shizuku ohne PC neu zu starten.
+     * Im Profil "Eigentümer" vorhanden; in anderen Profilen gibt es den Bildschirm nicht.
+     */
+    fun openDeveloperSettings(context: Context) {
+        try {
+            context.startActivity(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))
+        } catch (e: Exception) {
+            // Bildschirm in diesem Profil nicht verfügbar - nichts weiter zu tun.
+        }
+    }
+
     fun hasPermission(): Boolean {
         return try {
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
@@ -146,16 +187,35 @@ object ShizukuUtils {
 
     /**
      * Wechselt direkt zum angegebenen Profil - das ist der Ein-Klick-Schritt.
+     * hardenAdb: schaltet nach dem Wechsel Drahtloses Debugging aus, falls an (siehe AdbHardening).
      */
     fun switchToUser(
         context: Context,
         userId: Int,
+        hardenAdb: Boolean,
         onDone: () -> Unit,
         onError: (Exception) -> Unit
     ) {
         withUserService(context, onError) { service ->
-            service.switchUser(userId)
+            service.switchUser(userId, hardenAdb)
             postMain { onDone() }
+        }
+    }
+
+    /**
+     * Schaltet Drahtloses Debugging aus, sobald Shizuku läuft (Rückgabe: Konstante aus
+     * AdbHardening). Wird von SettingsActivity aufgerufen, damit der Zustand nach dem Start von
+     * Shizuku ohne PC dort sichtbar und korrigierbar ist - der Trigger-Pfad macht dasselbe
+     * still über den hardenAdb-Parameter des Wechsels.
+     */
+    fun disableWirelessDebugging(
+        context: Context,
+        onResult: (Int) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        withUserService(context, onError) { service ->
+            val code = service.disableWirelessDebugging()
+            postMain { onResult(code) }
         }
     }
 
@@ -174,11 +234,12 @@ object ShizukuUtils {
         context: Context,
         targetUserId: Int,
         sourceUserId: Int,
+        hardenAdb: Boolean,
         onDone: (endSessionSucceeded: Boolean) -> Unit,
         onError: (Exception) -> Unit
     ) {
         withUserService(context, onError) { service ->
-            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId)
+            val ok = service.switchUserAndEndSession(targetUserId, sourceUserId, hardenAdb)
             postMain { onDone(ok) }
         }
     }
@@ -195,6 +256,7 @@ object ShizukuUtils {
         onDone: () -> Unit,
         onError: (Exception) -> Unit
     ) {
+        val hardenAdb = prefs.getBoolean(KEY_AUTO_DISABLE_WIRELESS_DEBUGGING, true)
         if (prefs.getString(SettingsActivity.KEY_SWITCH_MODE, SettingsActivity.SWITCH_MODE_END_SESSION)
             == SettingsActivity.SWITCH_MODE_END_SESSION
         ) {
@@ -202,11 +264,18 @@ object ShizukuUtils {
                 context = context,
                 targetUserId = targetUserId,
                 sourceUserId = currentProfileUserId(),
+                hardenAdb = hardenAdb,
                 onDone = { onDone() },
                 onError = onError
             )
         } else {
-            switchToUser(context = context, userId = targetUserId, onDone = onDone, onError = onError)
+            switchToUser(
+                context = context,
+                userId = targetUserId,
+                hardenAdb = hardenAdb,
+                onDone = onDone,
+                onError = onError
+            )
         }
     }
 
@@ -248,7 +317,9 @@ object ShizukuUtils {
             .daemon(false)
             .processNameSuffix("privileged")
             .debuggable(false)
-            .version(5)
+            // Bei jeder Änderung an IUserService.aidl hochzählen - Shizuku ersetzt dann einen
+            // noch laufenden UserService der alten Schnittstellenversion.
+            .version(6)
     }
 
     /**
@@ -270,28 +341,29 @@ object ShizukuUtils {
         action: (IUserService) -> Unit
     ) {
         val appContext = context.applicationContext
+        debugLogging = (appContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         val args = userServiceArgs(appContext)
         // Stellt sicher, dass entweder der Timeout oder eine tatsaechliche Verbindung
         // gewinnt - nie beide: eine verspaetet eintreffende Verbindung nach Timeout darf
         // "action" nicht mehr ausloesen.
         val settled = java.util.concurrent.atomic.AtomicBoolean(false)
         lateinit var connection: ServiceConnection
-        android.util.Log.i("AtlayaSwitchClient", "withUserService: bind angefordert")
+        logInfo("withUserService: bind angefordert")
         connection = object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName, binder: IBinder) {
                 if (!settled.compareAndSet(false, true)) {
-                    android.util.Log.w("AtlayaSwitchClient", "withUserService: onServiceConnected NACH Timeout - verworfen")
+                    logWarn("withUserService: onServiceConnected NACH Timeout - verworfen")
                     Shizuku.unbindUserService(args, connection, true)
                     return
                 }
-                android.util.Log.i("AtlayaSwitchClient", "withUserService: verbunden, starte action()")
+                logInfo("withUserService: verbunden, starte action()")
                 Thread {
                     try {
                         val service = IUserService.Stub.asInterface(binder)
                         action(service)
-                        android.util.Log.i("AtlayaSwitchClient", "withUserService: action() beendet")
+                        logInfo("withUserService: action() beendet")
                     } catch (e: Exception) {
-                        android.util.Log.e("AtlayaSwitchClient", "withUserService: action() warf Exception", e)
+                        logError("withUserService: action() warf Exception", e)
                         postMain { onError(e) }
                     } finally {
                         Shizuku.unbindUserService(args, connection, true)
@@ -305,7 +377,7 @@ object ShizukuUtils {
         try {
             Shizuku.bindUserService(args, connection)
         } catch (e: Exception) {
-            android.util.Log.e("AtlayaSwitchClient", "withUserService: bindUserService warf Exception", e)
+            logError("withUserService: bindUserService warf Exception", e)
             if (settled.compareAndSet(false, true)) {
                 onError(e)
             }
@@ -314,7 +386,7 @@ object ShizukuUtils {
 
         mainHandler.postDelayed({
             if (settled.compareAndSet(false, true)) {
-                android.util.Log.w("AtlayaSwitchClient", "withUserService: Timeout - nie verbunden")
+                logWarn("withUserService: Timeout - nie verbunden")
                 try {
                     Shizuku.unbindUserService(args, connection, true)
                 } catch (e: Exception) {

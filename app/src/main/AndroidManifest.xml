@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Fuer die System-Benachrichtigung des Hintergrund-Update-Checks (UpdateCheckWorker) -
-         ab Android 13 (API 33) zur Laufzeit abgefragt, siehe SettingsActivity. -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="false"

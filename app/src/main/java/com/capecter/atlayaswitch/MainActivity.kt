@@ -37,16 +37,22 @@ class MainActivity : AppCompatActivity() {
             finish()
             return
         }
-        if (!ShizukuUtils.isShizukuAvailable()) {
-            toastAndFinish("Shizuku läuft nicht. Bitte Shizuku starten und erneut versuchen.")
-            return
-        }
 
         val targetUserId = prefs.getInt(KEY_TARGET_USER_ID, -1)
         if (targetUserId == -1) {
             // Noch kein Zielprofil festgelegt -> Einstellungen öffnen statt zu wechseln
+            // (dort steht bei Bedarf auch die geführte Shizuku-Einrichtung)
             startActivity(Intent(this, SettingsActivity::class.java))
             finish()
+            return
+        }
+
+        if (!ShizukuUtils.isShizukuAvailable()) {
+            // Shizuku läuft nicht - typischerweise nach einem Geräte-Neustart. Kein Toast mit
+            // Klartext (der Trigger soll unauffällig bleiben, ein "Shizuku läuft nicht" wäre
+            // vor Zuschauern verräterisch), sondern der normale Android-Nutzerwechsel als
+            // stiller Rückfall: zwei Taps mehr, aber man kommt trotzdem ins Zielprofil.
+            fallBackToSystemUserSwitcher()
             return
         }
 
@@ -60,24 +66,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun performSwitch() {
-        android.util.Log.i("AtlayaSwitchClient", "performSwitch: gestartet")
         val targetUserId = prefs.getInt(KEY_TARGET_USER_ID, -1)
-        val onError: (Exception) -> Unit = { e ->
-            Toast.makeText(this, "Wechsel fehlgeschlagen: ${e.message}", Toast.LENGTH_LONG).show()
-            finish()
-        }
 
         // Erfolg des Beendens (End-Session-Modus) wird bewusst nicht per Toast angezeigt
         // (auch nicht bei Fehlschlag, z.B. Profil "Eigentümer" laesst sich als
         // Systemnutzer nicht stoppen) - der Trigger soll unauffaellig bleiben, siehe
-        // Klassenkommentar.
+        // Klassenkommentar. Gleiches gilt fuer einen fehlgeschlagenen Wechsel: kein
+        // Fehler-Toast, sondern derselbe stille Rueckfall wie bei nicht laufendem Shizuku.
         ShizukuUtils.performConfiguredSwitch(
             context = this,
             prefs = prefs,
             targetUserId = targetUserId,
             onDone = { finish() },
-            onError = onError
+            onError = { fallBackToSystemUserSwitcher() }
         )
+    }
+
+    private fun fallBackToSystemUserSwitcher() {
+        ShizukuUtils.openUserSettings(this)
+        finish()
     }
 
     private fun toastAndFinish(msg: String) {

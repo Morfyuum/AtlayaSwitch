@@ -1,11 +1,8 @@
 package com.capecter.atlayaswitch
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.service.quicksettings.TileService
 import android.view.LayoutInflater
@@ -21,22 +18,14 @@ import android.widget.RadioGroup
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.Constraints
 import rikka.shizuku.Shizuku
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 /**
  * Zentrale Einstellungen von AtlayaSwitch: Zielprofil wählen. Erreichbar über
@@ -52,38 +41,28 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var targetProfileWarningText: TextView
     private lateinit var targetProfileWarningButton: Button
     private lateinit var switchModeGroup: RadioGroup
+    private lateinit var adbAutoOffSwitch: Switch
+    private lateinit var adbStatusText: TextView
+    private lateinit var adbDevButton: Button
     private lateinit var quickTileSwitch: Switch
     private lateinit var languageButton: Button
     private lateinit var helpButton: Button
     private lateinit var shizukuBanner: View
     private lateinit var shizukuStatusText: TextView
     private lateinit var openShizukuButton: Button
+    private lateinit var shizukuDevButton: Button
     private lateinit var switchProfileButton: Button
     private lateinit var installedVersionText: TextView
     private lateinit var updateStatusText: TextView
     private lateinit var updateCheckButton: Button
     private lateinit var updateDownloadButton: Button
     private lateinit var updateAutoSwitch: Switch
-    private lateinit var updateBackgroundSwitch: Switch
     private lateinit var supportContactButton: Button
     private lateinit var backButton: Button
 
     private var profileAdapter: ProfileAdapter? = null
     private var latestUpdateUrl: String? = null
     private var lastShizukuStateRefreshMs = 0L
-
-    /** Ergebnis der Laufzeit-Abfrage von POST_NOTIFICATIONS (nur Android 13+/API 33) beim
-     * Aktivieren des Hintergrund-Update-Checks - siehe updateBackgroundSwitch weiter unten. */
-    private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                schedulePeriodicUpdateCheck()
-            } else {
-                Toast.makeText(this, "Ohne Benachrichtigungs-Berechtigung kein Hintergrund-Update-Hinweis möglich.", Toast.LENGTH_LONG).show()
-                updateBackgroundSwitch.isChecked = false
-                prefs.edit().putBoolean(KEY_BACKGROUND_UPDATE_CHECK, false).apply()
-            }
-        }
 
     private val permissionListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == ShizukuUtils.REQUEST_CODE_PERMISSION) {
@@ -127,6 +106,21 @@ class SettingsActivity : AppCompatActivity() {
                 .apply()
         }
 
+        adbStatusText = findViewById(R.id.adb_status_text)
+        adbDevButton = findViewById(R.id.adb_dev_button)
+        adbDevButton.setOnClickListener { ShizukuUtils.openDeveloperSettings(this) }
+        adbAutoOffSwitch = findViewById(R.id.adb_auto_off_switch)
+        adbAutoOffSwitch.isChecked = prefs.getBoolean(ShizukuUtils.KEY_AUTO_DISABLE_WIRELESS_DEBUGGING, true)
+        adbAutoOffSwitch.setOnCheckedChangeListener { _, checked ->
+            prefs.edit().putBoolean(ShizukuUtils.KEY_AUTO_DISABLE_WIRELESS_DEBUGGING, checked).apply()
+            if (checked && ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
+                updateAdbStatus()
+            } else {
+                adbStatusText.text = ""
+                adbDevButton.visibility = View.GONE
+            }
+        }
+
         quickTileSwitch = findViewById(R.id.quick_tile_switch)
         quickTileSwitch.isChecked = prefs.getBoolean(KEY_QUICK_TILE_ENABLED, false)
         quickTileSwitch.setOnCheckedChangeListener { _, checked ->
@@ -137,6 +131,8 @@ class SettingsActivity : AppCompatActivity() {
         shizukuBanner = findViewById(R.id.shizuku_banner)
         shizukuStatusText = findViewById(R.id.shizuku_status_text)
         openShizukuButton = findViewById(R.id.shizuku_open_button)
+        shizukuDevButton = findViewById(R.id.shizuku_dev_button)
+        shizukuDevButton.setOnClickListener { ShizukuUtils.openDeveloperSettings(this) }
         switchProfileButton = findViewById(R.id.shizuku_switch_profile_button)
         switchProfileButton.setOnClickListener { ShizukuUtils.openUserSettings(this) }
 
@@ -158,24 +154,6 @@ class SettingsActivity : AppCompatActivity() {
         updateAutoSwitch.isChecked = prefs.getBoolean(KEY_AUTO_UPDATE_CHECK, false)
         updateAutoSwitch.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean(KEY_AUTO_UPDATE_CHECK, checked).apply()
-        }
-
-        updateBackgroundSwitch = findViewById(R.id.update_background_switch)
-        updateBackgroundSwitch.isChecked = prefs.getBoolean(KEY_BACKGROUND_UPDATE_CHECK, false)
-        updateBackgroundSwitch.setOnCheckedChangeListener { _, checked ->
-            prefs.edit().putBoolean(KEY_BACKGROUND_UPDATE_CHECK, checked).apply()
-            if (checked) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    schedulePeriodicUpdateCheck()
-                }
-            } else {
-                cancelPeriodicUpdateCheck()
-            }
         }
 
         supportContactButton = findViewById(R.id.support_contact_button)
@@ -223,6 +201,9 @@ class SettingsActivity : AppCompatActivity() {
 
         if (!ShizukuUtils.isShizukuAvailable()) {
             shizukuBanner.visibility = View.VISIBLE
+            shizukuDevButton.visibility = View.GONE
+            adbStatusText.text = ""
+            adbDevButton.visibility = View.GONE
             val installed = ShizukuUtils.isShizukuPackageInstalled(this)
             val owner = ShizukuUtils.isOwnerProfile()
 
@@ -244,6 +225,9 @@ class SettingsActivity : AppCompatActivity() {
                     openShizukuButton.visibility = View.VISIBLE
                     openShizukuButton.text = getString(R.string.settings_shizuku_open_button)
                     openShizukuButton.setOnClickListener { ShizukuUtils.openShizukuApp(this) }
+                    // Der typische Fall nach einem Geräte-Neustart: ohne PC über die
+                    // Entwickleroptionen (USB- und Drahtloses Debugging) neu starten.
+                    shizukuDevButton.visibility = View.VISIBLE
                     switchProfileButton.visibility = View.GONE
                 }
                 else -> {
@@ -375,9 +359,48 @@ class SettingsActivity : AppCompatActivity() {
                 } else {
                     targetProfileWarning.visibility = View.GONE
                 }
+
+                // Nacheinander statt gleichzeitig: jeder UserService-Bind ist auf diesem
+                // Geraet ohnehin langsam (siehe USER_SERVICE_TIMEOUT_MS), parallele Binds
+                // verstopfen den Dienst zusaetzlich.
+                if (prefs.getBoolean(ShizukuUtils.KEY_AUTO_DISABLE_WIRELESS_DEBUGGING, true)) {
+                    updateAdbStatus()
+                }
             },
             onError = { e ->
                 Toast.makeText(this, "Profile konnten nicht geladen werden: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        )
+    }
+
+    /**
+     * Schaltet Drahtloses Debugging aus (falls an) und zeigt das Ergebnis. Drahtloses Debugging
+     * wird nur gebraucht, um Shizuku nach einem Neustart ohne PC zu starten - danach nur noch
+     * offener Netzwerk-Port. Bleibt USB-Debugging aus, wird bewusst NICHT ausgeschaltet (das
+     * würde adbd komplett stoppen und Shizuku beenden); stattdessen erklärt der Text den Weg
+     * und ein Knopf öffnet die Entwickleroptionen (siehe AdbHardening).
+     */
+    private fun updateAdbStatus() {
+        ShizukuUtils.disableWirelessDebugging(
+            context = this,
+            onResult = { code ->
+                adbDevButton.visibility = View.GONE
+                when (code) {
+                    AdbHardening.WIFI_ALREADY_OFF ->
+                        adbStatusText.setText(R.string.settings_adb_status_already_off)
+                    AdbHardening.WIFI_TURNED_OFF ->
+                        adbStatusText.setText(R.string.settings_adb_status_turned_off)
+                    AdbHardening.KEPT_USB_DEBUGGING_OFF -> {
+                        adbStatusText.setText(R.string.settings_adb_status_usb_off)
+                        // Entwickleroptionen gibt es nur im Profil "Eigentümer".
+                        if (ShizukuUtils.isOwnerProfile()) adbDevButton.visibility = View.VISIBLE
+                    }
+                    else -> adbStatusText.setText(R.string.settings_adb_status_failed)
+                }
+            },
+            onError = {
+                // Nur eine Zusatzinfo - der eigentliche Profilwechsel ist davon unabhängig.
+                adbStatusText.text = ""
             }
         )
     }
@@ -460,28 +483,8 @@ class SettingsActivity : AppCompatActivity() {
         override fun getItemCount(): Int = profiles.size
     }
 
-    /** Registriert den periodischen Hintergrund-Check bei WorkManager - Mindestintervall
-     * von Android ist 15 Minuten, taeglich reicht fuer einen Update-Hinweis voellig aus und
-     * schont den Akku. Ueberlebt App-Neustarts UND Geraete-Neustarts automatisch (WorkManager
-     * persistiert eingeplante Arbeit selbst), es ist also keine BOOT_COMPLETED-Behandlung nötig. */
-    private fun schedulePeriodicUpdateCheck() {
-        val request = PeriodicWorkRequestBuilder<UpdateCheckWorker>(1, TimeUnit.DAYS)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .build()
-        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
-            UpdateCheckWorker.UNIQUE_WORK_NAME,
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-    }
-
-    private fun cancelPeriodicUpdateCheck() {
-        WorkManager.getInstance(applicationContext).cancelUniqueWork(UpdateCheckWorker.UNIQUE_WORK_NAME)
-    }
-
     companion object {
         const val KEY_AUTO_UPDATE_CHECK = "auto_update_check"
-        const val KEY_BACKGROUND_UPDATE_CHECK = "background_update_check"
         const val KEY_SWITCH_MODE = "switch_mode"
         const val KEY_QUICK_TILE_ENABLED = "quick_tile_enabled"
         const val SWITCH_MODE_SWITCH_ONLY = "switch_only"
