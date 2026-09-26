@@ -15,6 +15,18 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 - Automatically detects if it's accidentally installed in the decoy profile itself (which would give the trick away) and offers one-tap removal
 - Fully offline, no cloud, no trackers
 
+## Concept: a graduated response
+
+AtlayaSwitch is the **first stage** of a graduated response for moments when someone wants to see your unlocked phone — a check, coercion, theft. One tap on the app icon, and the device instantly switches, with no visible menu, to a decoy profile (e.g. "Away"). Anyone looking at the device afterwards sees an everyday, unremarkable profile — and initially nothing that points to further profiles.
+
+The core idea is **a reaction that matches the situation**: you don't have to take the most drastic step immediately. You can show only the decoy profile first. Only if you yourself decide the situation calls for it do you go one step further:
+
+1. **Normal state:** you're using "Personal" or "Owner", the device is locked.
+2. **Show the decoy profile:** you're asked to unlock or show the device. One tap — the decoy profile appears. Often that's enough on its own.
+3. **Duress PIN as a last resort — only if you decide to:** if someone realises there are further profiles and demands access, you can give them GrapheneOS' own **duress PIN** as a supposed unlock code. If entered, GrapheneOS destroys the encryption — the data becomes permanently unreadable, and you're protected because no one can get to it anymore.
+
+**Important:** AtlayaSwitch neither triggers the duress PIN nor replaces it. It's GrapheneOS' own feature, which you set up yourself (availability and details depend on your GrapheneOS version — see GrapheneOS' own documentation). Whether and when to escalate is entirely your call, there's no automatism. Also keep in mind: the destruction is **final** — keep backups of your data somewhere safe and separate, and consider the legal situation in your jurisdiction (this isn't legal advice).
+
 ## How it works
 
 - **MainActivity** immediately performs the switch to the saved target profile on launch (no visible UI) and then closes itself.
@@ -53,14 +65,32 @@ Because a tile is, unlike the icon tap, visible in the pulled-down panel, it's *
 
 To use it: enable "Enable tile" in Settings, then add the tile to the panel yourself via the pencil/edit icon in Quick Settings.
 
-## Security consideration: lock screen on the decoy profile
+## What belongs in the decoy profile
 
-For the switch to stay a genuine single tap with no further prompt, the decoy/duress profile should have **no PIN, password or fingerprint lock** set — any lock screen there would just present its own unlock prompt after the switch. Leaving it unlocked keeps the one-tap promise, but it's a trade-off: anyone who reaches that profile also has unrestricted access to whatever is in it, with no second gate at all. Whether that trade-off makes sense depends entirely on what you put in the decoy profile and your own threat model — it's your call, not something the app decides for you.
+The decoy profile is the only thing a third party ever gets to see. It should be **believable but unremarkable** — the way the phone of someone with nothing to hide would look. A completely empty profile looks suspicious and raises more questions than it answers.
+
+**Put in:**
+- a few harmless everyday photos and a small, unremarkable contact list
+- everyday apps unrelated to your real accounts: camera, maps (prefer FOSS options like OrganicMaps or OsmAnd — no Google services, GrapheneOS is deliberately de-googled), weather, notes with mundane content, music/podcasts, a browser with some neutral history and bookmarks
+- settings consistent with a normally used device (wallpaper, ringtone, a few calendar entries)
+
+**Don't put in:**
+- real accounts, logins or chats tied to your main identity; password managers, authenticators, banking apps
+- real private photos, documents or contacts that could endanger you or others
+- AtlayaSwitch or Shizuku themselves — they would give away the hidden switching mechanism (the app warns about this and offers one-tap removal from the target profile, see below)
+- anything hinting at further profiles: notes, shortcuts, names, a note with the duress PIN written down
+- sync or backups shared with your real profile
+
+**No lock on the decoy profile:** for the switch to stay a genuine single tap with no further prompt, the decoy/duress profile should have **no PIN, password or fingerprint lock** set — any lock screen there would just present its own unlock prompt after the switch. Leaving it unlocked keeps the one-tap promise, but it's a trade-off: anyone who reaches that profile has unrestricted access to whatever is in it, with no second gate at all — so nothing should be there that isn't fine for anyone to see.
+
+**What someone sees there:** initially just the decoy profile's content, nothing about your other profiles. Closer inspection can reveal more: Android's own user-switcher UI can list further profiles, and device-wide settings like saved Wi-Fi networks or paired Bluetooth devices can show revealing names across profiles. Check what's reachable from inside the decoy profile.
 
 ## Known trade-offs (please read)
 
 - **ADB is part of the design.** Shizuku can only be started through Android's debugging service (`adbd`); without root there is no other way to get a process with shell rights. So Developer options and USB debugging stay on, and Wireless debugging is on briefly after each reboot. That is more attack surface than a phone without it, and it's the reason this app isn't for everyone — especially not for users who chose GrapheneOS to minimise exactly that.
 - **What limits the exposure:** Wireless debugging goes off again automatically (see Setup), so no debugging port is left open on the network after the start. `adbd` over USB additionally needs a cable, an unlocked device and an authorised key (GrapheneOS' USB-C port setting is a further gate). Only apps you explicitly grant in Shizuku can use its shell rights — check that AtlayaSwitch is the only one. The `UserService` that runs with shell rights only accepts the fixed commands it needs and only acts on AtlayaSwitch's own package.
+- **Can a stranger's computer just connect over ADB? Not without more.** USB debugging requires a cable *and* a computer confirmed on the device itself (an RSA-key confirmation dialog appears on screen — no tap, no connection). Wireless debugging additionally requires either the same one-time pairing code (shown on the phone, entered on the other device) or an already-authorised key on the same network. A stranger on the same Wi-Fi can't just get in through that.
+- **The real risk isn't a stranger, it's an already-authorised computer.** Once a computer is confirmed with "always allow", its key becomes a standing master key: every future connection from it goes through without any further on-device confirmation, even on a locked screen (as long as the profile has been unlocked at least once since the last reboot). A compromised computer of your own — or a leaked `adbkey` file — is therefore a standing, PIN-free way in. Mitigations: only ever authorise your own, secured computer; "Revoke USB debugging authorisations" in Developer options revokes all trusted keys at once if you're ever unsure; GrapheneOS' own **Auto reboot** feature (Settings → Security) returns the device to the "Before First Unlock" state after some hours of inactivity, at which point not even an authorised computer can get in without the real PIN; "Switch + end session" mode reinforces this further, since an ended profile stays encrypted at rest until it's unlocked again — including against ADB.
 - **It's not a lock.** The target profile can be recognised as "not the main profile". It only helps if it's plausibly filled with everyday content (a few photos, some apps, a bit of history) — an empty profile looks suspicious and raises more questions than it answers.
 - **Shizuku dies with every reboot**, see Setup. Until you've started it again, the icon tap can't switch by itself (it opens Android's user switcher as a quiet fallback).
 - **Any app in the same profile can start the switch** (the launcher activity has to be exported). With "Switch + end session" this also ends the source profile. The worst case is landing in the unremarkable target profile — no security risk, but an annoyance.
