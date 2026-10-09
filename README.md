@@ -17,6 +17,9 @@ AtlayaSwitch is a lightweight, root-free Android app for GrapheneOS that switche
 > - **Biggest remaining risk:** a computer you once authorised with "always allow" stays a standing key. Only authorise your own, secured computer; use "Revoke USB debugging authorisations" if unsure; enable GrapheneOS **Auto reboot**.
 > - Details and further mitigations: see [Known trade-offs](#known-trade-offs-please-read).
 
+> [!NOTE]
+> **Free of charge.** AtlayaSwitch costs nothing and has no trial period or license key. The source code is in this repository; the ready-built app can be downloaded from [atlaya.capecter.com](https://atlaya.capecter.com/atlayaswitch/de/) (the website also hosts the update feed the app checks).
+
 **Benefits:**
 - No root required — uses [Shizuku's](https://shizuku.rikka.app/) ADB shell privileges. **This is a real trade-off, not free:** it needs Developer options and USB debugging switched on, and Wireless debugging briefly after every reboot — see "Known trade-offs" below
 - No visible picker menu, no spoken codeword — switches in under a second
