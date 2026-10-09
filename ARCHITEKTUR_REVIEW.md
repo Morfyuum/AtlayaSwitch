@@ -129,7 +129,7 @@ Jede public Funktion in `ShizukuUtils`, `UserService`/`IUserService`,
 `SwitchDebounce`, `UpdateChecker` hat mindestens einen nachweisbaren Aufrufer
 (siehe 2.1). Alle Imports in allen 8 Kotlin-Dateien werden tatsächlich benutzt
 (einzeln geprüft, keine Ausnahme). Trotz Entfernung des NFC-Ring-Triggers in
-v1.8.2 (laut `interne Projekt-Doku`) wurde per Grep nach `nfc`/`Nfc`/`NFC` im gesamten
+v1.8.2 (laut interner Projekt-Doku) wurde per Grep nach `nfc`/`Nfc`/`NFC` im gesamten
 `app/src`-Baum gesucht: Treffer ausschließlich in Kommentaren/Strings, die die
 Entfernung *erklären* (z. B. `settings_quick_tile_hint`,
 `QuickSwitchTileService`-Klassenkommentar) – kein NFC-Code, keine

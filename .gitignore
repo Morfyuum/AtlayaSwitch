@@ -12,7 +12,6 @@ local.properties
 keystore.properties
 
 # Editor-/Tool-Konfiguration
-.Entwicklungswerkzeug/
 .vscode/
 .idea/
 AtlayaSwitch.code-workspace
@@ -21,8 +20,6 @@ AtlayaSwitch.code-workspace
 /save/
 
 # Interne Entwicklungs-Notizen (Bedrohungsmodell, Arbeitsprompts) - nicht fuer die Veroeffentlichung
-/interne Projekt-Doku
-/interne Projekt-Doku
 /PROMPT_NFC_TRIGGER.md
 
 # Android Studio
