@@ -63,5 +63,5 @@
     <string name="settings_update_download_button">Herunterladen</string>
     <string name="settings_update_auto_label">Beim Öffnen automatisch prüfen</string>
     <string name="settings_section_support">Support</string>
-    <string name="settings_support_button">Support kontaktieren</string>
+    <string name="settings_support_email" translatable="false">AtlayaSwitch@capecter.com</string>
 </resources>

@@ -57,7 +57,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var updateCheckButton: Button
     private lateinit var updateDownloadButton: Button
     private lateinit var updateAutoSwitch: Switch
-    private lateinit var supportContactButton: Button
     private lateinit var backButton: Button
 
     private var profileAdapter: ProfileAdapter? = null
@@ -156,8 +155,6 @@ class SettingsActivity : AppCompatActivity() {
             prefs.edit().putBoolean(KEY_AUTO_UPDATE_CHECK, checked).apply()
         }
 
-        supportContactButton = findViewById(R.id.support_contact_button)
-        supportContactButton.setOnClickListener { openSupportMail() }
 
         backButton = findViewById(R.id.settings_back_button)
         backButton.setOnClickListener { finish() }
@@ -497,24 +494,5 @@ class SettingsActivity : AppCompatActivity() {
     private fun licenseUrl(): String {
         val tag = currentLanguageTag().takeIf { it in LICENSE_SITE_LANGUAGES } ?: "de"
         return "https://atlaya.capecter.com/atlayaswitch/$tag/lizenz.html"
-    }
-
-    /** Versionsnummer wird vorausgefuellt (analog zu installedVersionText oben) - erspart
-     * Chris die Rueckfrage "welche Version?" bei jeder Support-Mail. */
-    private fun openSupportMail() {
-        val versionName = packageManager.getPackageInfo(packageName, 0).versionName ?: "?"
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:AtlayaSwitch@capecter.com")
-            putExtra(Intent.EXTRA_SUBJECT, "[AtlayaSwitch] Support")
-            putExtra(
-                Intent.EXTRA_TEXT,
-                "(Bitte hier beschreiben, was nicht funktioniert oder gewünscht ist.)\n\n---\nAtlayaSwitch $versionName"
-            )
-        }
-        try {
-            startActivity(intent)
-        } catch (e: android.content.ActivityNotFoundException) {
-            Toast.makeText(this, "Keine E-Mail-App gefunden.", Toast.LENGTH_LONG).show()
-        }
     }
 }

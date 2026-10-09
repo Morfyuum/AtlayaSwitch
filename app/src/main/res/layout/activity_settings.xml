@@ -348,11 +348,13 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/support_contact_button"
+        <TextView
+            android:id="@+id/support_email_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_support_button"
+            android:text="@string/settings_support_email"
+            android:textSize="16sp"
+            android:textIsSelectable="true"
             android:layout_marginBottom="8dp" />
 
         <View
