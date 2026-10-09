@@ -188,7 +188,7 @@
             android:layout_height="wrap_content"
             android:text="@string/settings_adb_tradeoff"
             android:textSize="14sp"
-            android:textColor="#EAEAEA"
+            android:textColor="?android:attr/textColorPrimary"
             android:background="@drawable/bg_warning_box"
             android:padding="12dp"
             android:layout_marginBottom="16dp" />
